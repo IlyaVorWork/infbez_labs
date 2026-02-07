@@ -1,6 +1,7 @@
-package lab1
+package Thrithemus
 
 import (
+	"fmt"
 	"slices"
 )
 
@@ -64,6 +65,9 @@ func (a *Alphabet) BuildThrithemusAlphabet(key string) []rune {
 
 	for _, char := range []rune(key) {
 		temp := char
+		if len(ThrithemusAlphabet) == 32 {
+			break
+		}
 		for slices.Contains(ThrithemusAlphabet, temp) {
 			temp = []rune(a.GetCharByKey((a.GetKeyByChar(string(temp)) + 1) % 32))[0]
 		}
@@ -71,11 +75,14 @@ func (a *Alphabet) BuildThrithemusAlphabet(key string) []rune {
 	}
 
 	for _, r := range TelegraphAlphabet {
+		if len(ThrithemusAlphabet) == 32 {
+			break
+		}
 		if !slices.Contains(ThrithemusAlphabet, r) {
 			ThrithemusAlphabet = append(ThrithemusAlphabet, r)
 		}
 	}
-
+	fmt.Println("вышел")
 	return ThrithemusAlphabet
 }
 

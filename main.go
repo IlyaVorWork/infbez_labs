@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	l1 "infbez_labs/lab1"
+	l1 "infbez_labs/Lab1"
 )
 
 func main() {
@@ -10,8 +10,15 @@ func main() {
 
 	var key string
 	var text string
-	fmt.Scanln(&key)
-	fmt.Scanln(&text)
+	_, err := fmt.Scanln(&key)
+	if err != nil {
+		return
+	}
+
+	_, err = fmt.Scanln(&text)
+	if err != nil {
+		return
+	}
 
 	table := lab1.BuildThrithemusAlphabet(key)
 	fmt.Println(string(table))
