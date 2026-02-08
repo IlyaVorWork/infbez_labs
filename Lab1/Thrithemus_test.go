@@ -1,30 +1,31 @@
-package Thrithemus_test
+package trithemius_test
 
 import (
-	/* "fmt" */
 	l1 "infbez_labs/Lab1"
 	"testing"
 )
 
-func TestSThrithemus_nearbyEntrances(t *testing.T) {
-	alphabet := l1.NewAlphabet()
+var TelegraphAlphabet = []rune("АБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЫЬЭЮЯ_")
+
+func TestSTrithemius_nearbyEntrances(t *testing.T) {
+	alphabet := l1.NewTrithemius(TelegraphAlphabet)
 
 	var (
-		IN1 string = "ОРЕХ"
-		IN2 string = "ОПЕХ"
-		IN3 string = "ОПЕФ"
+		IN1 = "ОРЕХ"
+		IN2 = "ОПЕХ"
+		IN3 = "ОПЕФ"
 	)
 
 	var (
-		KEY1 string = "ХОРОШО_БЫТЬ_ВАМИ"
-		KEY2 string = "МОЛЧАНИЕ_ЗОЛОТО_"
+		KEY1 = "ХОРОШО_БЫТЬ_ВАМИ"
+		KEY2 = "МОЛЧАНИЕ_ЗОЛОТО_"
 	)
 
 	tests := []struct {
 		name       string
 		openText   string
 		key        string
-		chiperText string
+		cipherText string
 	}{
 		{"ОРЕХ_ХорошоБытьВами", IN1, KEY1, "ТЬЧЫ"},
 		{"ОПЕХ_ХорошоБытьВами", IN2, KEY1, "ТАЧЫ"},
@@ -36,10 +37,10 @@ func TestSThrithemus_nearbyEntrances(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := alphabet.EncodeSThrithemus(tt.openText, tt.key)
+			got := alphabet.EncodeSTrithemius(tt.openText, tt.key)
 
-			if got != tt.chiperText {
-				t.Errorf("Thrithemus(text=%q , key=%q), want %q but return %q", tt.openText, tt.key, tt.chiperText, got)
+			if got != tt.cipherText {
+				t.Errorf("Thrithemus(text=%q , key=%q), want %q but return %q", tt.openText, tt.key, tt.cipherText, got)
 				return
 			}
 
@@ -48,16 +49,16 @@ func TestSThrithemus_nearbyEntrances(t *testing.T) {
 }
 
 func TestAlphabet(t *testing.T) {
-	alphabet := l1.NewAlphabet()
+	alphabet := l1.NewTrithemius(TelegraphAlphabet)
 
 	var (
-		K1 string = "ДИНОЗАВР_ЗАУРОПОД"
-		K2 string = "ГАМЕЛЬНСКИЙ_АНТИКВАР"
-		K3 string = "ГАРРИ_ПОТТЕР_И_ФИЛОСОФСКИЙ_КАМЕНЬ"
+		K1 = "ДИНОЗАВР_ЗАУРОПОД"
+		K2 = "ГАМЕЛЬНСКИЙ_АНТИКВАР"
+		K3 = "ГАРРИ_ПОТТЕР_И_ФИЛОСОФСКИЙ_КАМЕНЬ"
 
-		OutputTable1 string = "ДИНОЗАВР_ЙБУСПТФЕГЖКЛМХЦЧШЩЫЬЭЮЯ"
-		OutputTable2 string = "ГАМЕЛЬНСКИЙ_БОТПРВДУЖЗФХЦЧШЩЫЭЮЯ"
-		OutputTable3 string = "ГАРСИ_ПОТУЕФБЙВХКЛЦЧШЩЫМНЬДЭЖЮЗЯ"
+		OutputTable1 = "ДИНОЗАВР_ЙБУСПТФЕГЖКЛМХЦЧШЩЫЬЭЮЯ"
+		OutputTable2 = "ГАМЕЛЬНСКИЙ_БОТПРВДУЖЗФХЦЧШЩЫЭЮЯ"
+		OutputTable3 = "ГАРСИ_ПОТУЕФБЙВХКЛЦЧШЩЫМНЬДЭЖЮЗЯ"
 	)
 
 	tests := []struct {
@@ -72,10 +73,10 @@ func TestAlphabet(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := string(alphabet.BuildThrithemusAlphabet(tt.inputTable))
+			got := string(alphabet.BuildTrithemiusAlphabet(tt.inputTable))
 
 			if tt.outputTable != got {
-				t.Errorf("Faild BuildThrithemusAlphabet(input=%q), want %v but return %v", tt.inputTable, tt.outputTable, got)
+				t.Errorf("Faild BuildTrithemiusAlphabet(input=%q), want %v but return %v", tt.inputTable, tt.outputTable, got)
 				return
 			}
 

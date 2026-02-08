@@ -6,29 +6,34 @@ import (
 )
 
 func main() {
-	lab1 := l1.NewAlphabet()
+	var TelegraphAlphabet = []rune("АБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЫЬЭЮЯ_")
 
-	var key string
-	var text string
-	_, err := fmt.Scanln(&key)
+	lab1 := l1.NewTrithemius(TelegraphAlphabet)
+
+	var (
+		key  string
+		text string
+	)
+
+	_, err := fmt.Scanln(&text)
 	if err != nil {
 		return
 	}
 
-	_, err = fmt.Scanln(&text)
+	_, err = fmt.Scanln(&key)
 	if err != nil {
 		return
 	}
 
-	table := lab1.BuildThrithemusAlphabet(key)
+	table := lab1.BuildTrithemiusAlphabet(key)
 	fmt.Println(string(table))
-	encodedText := lab1.EncodePolyThrithemus(text, key)
-	decodedText := lab1.DecodePolyThrithemus(encodedText, key)
+	encodedText := lab1.EncodePolyTrithemius(text, key)
+	decodedText := lab1.DecodePolyTrithemius(encodedText, key)
 	fmt.Println(encodedText)
 	fmt.Println(decodedText)
 
-	encodedSText := lab1.EncodeSThrithemus(text, key)
-	decodedSText := lab1.DecodeSThrithemus(encodedSText, key)
+	encodedSText := lab1.EncodeSTrithemius(text, key)
+	decodedSText := lab1.DecodeSTrithemius(encodedSText, key)
 	fmt.Println(encodedSText)
 	fmt.Println(decodedSText)
 
@@ -37,19 +42,9 @@ func main() {
 	fmt.Println(encodeMergeBlock)
 	fmt.Println(decodedMergeBlock)
 
-	encodedTrithemusM := lab1.EncodeSThrithemusM(text, key)
-	decodedTrithemusM := lab1.DecodeSThrithemusM(encodedTrithemusM, key)
-	fmt.Println(encodedTrithemusM)
-	fmt.Println(decodedTrithemusM)
-
-	/*
-		fmt.Println(string(lab1.ShiftThrithemusAlphabet(table, "Х", 16)))
-		fmt.Println(string(lab1.ShiftThrithemusAlphabet(table, "Х", 18)))
-		fmt.Println(string(lab1.ShiftThrithemusAlphabet(table, "Я", 16)))
-		fmt.Println(string(lab1.ShiftThrithemusAlphabet(table, "А", 8)))
-		fmt.Println(string(lab1.ShiftThrithemusAlphabet(table, "А", 23)))
-		fmt.Println(string(lab1.ShiftThrithemusAlphabet(table, "А", 30)))
-		fmt.Println(string(lab1.ShiftThrithemusAlphabet(table, "А", 1)))
-	*/
+	encodedTrithemiusM := lab1.EncodeSTrithemiusM(text, key)
+	decodedTrithemiusM := lab1.DecodeSTrithemiusM(encodedTrithemiusM, key)
+	fmt.Println(encodedTrithemiusM)
+	fmt.Println(decodedTrithemiusM)
 
 }
