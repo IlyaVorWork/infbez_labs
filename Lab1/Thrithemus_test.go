@@ -37,7 +37,7 @@ func TestTrithemius_BuildTrithemiusAlphabet(t *testing.T) {
 			got := string(alphabet.BuildTrithemiusAlphabet(tt.inputTable))
 
 			if tt.outputTable != got {
-				t.Errorf("Faild BuildTrithemiusAlphabet(input=%q), want %v but return %v", tt.inputTable, tt.outputTable, got)
+				t.Errorf("Failed BuildTrithemiusAlphabet(input=%q), want %v but return %v", tt.inputTable, tt.outputTable, got)
 				return
 			}
 
@@ -77,7 +77,7 @@ func TestTrithemius_GetCharByKey(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := alphabet.GetCharByKey(tt.inputKey); tt.outputChar != got {
-				t.Errorf("Faild GetCharByKey(Key=%v), want %v but return %v", tt.inputKey, tt.outputChar, got)
+				t.Errorf("Failed GetCharByKey(Key=%v), want %v but return %v", tt.inputKey, tt.outputChar, got)
 				return
 			}
 
@@ -117,7 +117,7 @@ func TestTrithemius_GetKeyByChar(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := alphabet.GetKeyByChar(tt.inputChar); tt.OutputKey != got {
-				t.Errorf("Faild GetKeyByChar(Char=%v), want %v but return %v", tt.inputChar, tt.OutputKey, got)
+				t.Errorf("Failed GetKeyByChar(Char=%v), want %v but return %v", tt.inputChar, tt.OutputKey, got)
 				return
 			}
 		})
@@ -148,7 +148,7 @@ func TestTrithemius_AddTxt(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := alphabet.AddTxt(tt.input1, tt.input2); tt.Output != got {
-				t.Errorf("Faild AddTxt(Text1=%v, Text2=%v), want %v but return %v", tt.input1, tt.input2, tt.Output, got)
+				t.Errorf("Failed AddTxt(Text1=%v, Text2=%v), want %v but return %v", tt.input1, tt.input2, tt.Output, got)
 				return
 			}
 		})
@@ -180,7 +180,7 @@ func TestTrithemius_SubTxt(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := alphabet.SubTxt(tt.input1, tt.input2); tt.Output != got {
-				t.Errorf("Faild SubTxt(Text1=%v, Text2=%v), want %v but return %v", tt.input1, tt.input2, tt.Output, got)
+				t.Errorf("Failed SubTxt(Text1=%v, Text2=%v), want %v but return %v", tt.input1, tt.input2, tt.Output, got)
 				return
 			}
 		})
@@ -403,9 +403,8 @@ func TestTrithemius_ShiftTrithemiusAlphabet(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := string(alphabet.ShiftTrithemiusAlphabet(table, tt.inputSym, tt.inputBias))
-			print(got)
 			if tt.outputTable != got {
-				t.Errorf("Faild ShiftTrithemiusAlphabet(sym=%v, bias%v), want %v but return %v", tt.inputSym, tt.inputBias, tt.outputTable, got)
+				t.Errorf("Failed ShiftTrithemiusAlphabet(sym=%v, bias%v), want %v but return %v", tt.inputSym, tt.inputBias, tt.outputTable, got)
 				return
 			}
 		})
@@ -591,7 +590,7 @@ func TestTrithemius_DecodeSTrithemius_BasicTests(t *testing.T) {
 			got := alphabet.DecodeSTrithemius(tt.cipherText, tt.key)
 
 			if got != tt.openText {
-				t.Errorf("STrithemius(chiperText=%q , key=%q), want %q but return %q", tt.cipherText, tt.key, tt.openText, got)
+				t.Errorf("STrithemius(cipherText=%q , key=%q), want %q but return %q", tt.cipherText, tt.key, tt.openText, got)
 				return
 			}
 		})

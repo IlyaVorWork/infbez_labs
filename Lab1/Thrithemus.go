@@ -71,7 +71,7 @@ func (a *Trithemius) AddTxt(txt1, txt2 string) string {
 		r1, r2 = r2, r1
 	}
 	var builder strings.Builder
-	builder.Grow(len(txt1))
+	builder.Grow(len(r1))
 
 	for i := 0; i < len(r2); i++ {
 		char1 := string(r1[i])
