@@ -108,13 +108,6 @@ func (a *Trithemius) SubTxt(txt1, txt2 string) string {
 		builder.WriteString(a.SubtractChars(char1, char2))
 	}
 	placeholder := "_"
-	if a.GetKeyByChar(placeholder) < 0 {
-		if a.alphabetLength > 0 {
-			placeholder = string(a.alphabet[0])
-		} else {
-			placeholder = "_"
-		}
-	}
 
 	if M > m {
 		for i := m; i < M; i++ {
@@ -126,7 +119,6 @@ func (a *Trithemius) SubTxt(txt1, txt2 string) string {
 			}
 		}
 	}
-
 	return builder.String()
 }
 
