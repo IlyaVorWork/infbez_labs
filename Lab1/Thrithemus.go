@@ -2,6 +2,7 @@ package trithemius
 
 import (
 	"slices"
+	"strings"
 )
 
 // Trithemius TODO Убрать магические числа в коде
@@ -14,10 +15,12 @@ func NewTrithemius(TelegraphAlphabet []rune) *Trithemius {
 	return &Trithemius{TelegraphAlphabet, len(TelegraphAlphabet)} //TODO Узнать как правильно задать значение по умолчанию
 }
 
+// GetCharByKey Довольно опасно, что число 21309, вернут какую-то букву.
 func (a *Trithemius) GetCharByKey(key int) string {
 	return string(a.alphabet[(32+key-1)%32])
 }
 
+// TODO Плохое решение идти перебором по массиву
 func (a *Trithemius) GetKeyByChar(char string) int {
 	for i, r := range a.alphabet {
 		if r == []rune(char)[0] {
@@ -36,11 +39,14 @@ func (a *Trithemius) TextToArray(text string) []int {
 }
 
 func (a *Trithemius) ArrayToText(array []int) string {
-	res := ""
+	var builder strings.Builder
+	builder.Grow(len(array))
+
 	for _, key := range array {
-		res += a.GetCharByKey(key)
+		char := a.GetCharByKey(key)
+		builder.WriteString(char)
 	}
-	return res
+	return builder.String()
 }
 
 func (a *Trithemius) AddChars(charX, charY string) string {
@@ -55,6 +61,64 @@ func (a *Trithemius) SubtractChars(charX, charY string) string {
 	charYIndex := a.GetKeyByChar(charY)
 
 	return a.GetCharByKey(32 + charXIndex - charYIndex)
+}
+
+func (a *Trithemius) AddTxt(txt1, txt2 string) string {
+	r1 := []rune(txt1)
+	r2 := []rune(txt2)
+
+	if len(r1) < len(r2) {
+		r1, r2 = r2, r1
+	}
+	var builder strings.Builder
+	builder.Grow(len(r1))
+
+	for i := 0; i < len(r2); i++ {
+		char1 := string(r1[i])
+		char2 := string(r2[i])
+		builder.WriteString(a.AddChars(char1, char2))
+	}
+	for i := len(r2); i < len(r1); i++ {
+		builder.WriteString(string(r1[i]))
+	}
+
+	return builder.String()
+}
+
+func (a *Trithemius) SubTxt(txt1, txt2 string) string {
+	r1 := []rune(txt1)
+	r2 := []rune(txt2)
+
+	flag := 0
+	TIN := r1
+	if len(r1) < len(r2) {
+		TIN = r2
+		flag = 1
+	}
+
+	m := min(len(r1), len(r2))
+	M := len(TIN)
+
+	var builder strings.Builder
+	builder.Grow(M)
+
+	for i := 0; i < m; i++ {
+		char1 := string(r1[i])
+		char2 := string(r2[i])
+		builder.WriteString(a.SubtractChars(char1, char2))
+	}
+	placeholder := "_"
+
+	for i := m; i < M; i++ {
+		t := string(TIN[i])
+		if flag == 1 {
+			builder.WriteString(a.SubtractChars(placeholder, t))
+		} else {
+			builder.WriteString(a.SubtractChars(t, placeholder))
+		}
+	}
+
+	return builder.String()
 }
 
 func (a *Trithemius) BuildTrithemiusAlphabet(key string) []rune {
@@ -181,7 +245,7 @@ func (a *Trithemius) EncodeMergeBlock(block, key string) string {
 		if i%2 == 1 {
 			sign = -1
 		}
-		sum = (24 + sum + sign*keyArr[i]) % 24
+		sum = ((24+sum+sign*keyArr[i])%24 + 24) % 24
 	}
 	for k := 0; k < 3; k++ {
 		t := sum % (4 - k)
@@ -212,7 +276,7 @@ func (a *Trithemius) DecodeMergeBlock(block, key string) string {
 		if i%2 == 1 {
 			sign = -1
 		}
-		sum = (24 + sum + sign*keyArr[i]) % 24
+		sum = ((24+sum+sign*keyArr[i])%24 + 24) % 24
 	}
 	for k := 0; k < 3; k++ {
 		t := sum % (4 - k)
