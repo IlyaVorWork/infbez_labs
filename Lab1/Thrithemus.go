@@ -91,7 +91,7 @@ func (a *Trithemius) SubTxt(txt1, txt2 string) string {
 
 	flag := 0
 	TIN := r1
-	if len(r1) <= len(r2) {
+	if len(r1) < len(r2) {
 		TIN = r2
 		flag = 1
 	}
@@ -109,16 +109,15 @@ func (a *Trithemius) SubTxt(txt1, txt2 string) string {
 	}
 	placeholder := "_"
 
-	if M > m {
-		for i := m; i < M; i++ {
-			t := string(TIN[i])
-			if flag == 1 {
-				builder.WriteString(a.SubtractChars(placeholder, t))
-			} else {
-				builder.WriteString(a.SubtractChars(t, placeholder))
-			}
+	for i := m; i < M; i++ {
+		t := string(TIN[i])
+		if flag == 1 {
+			builder.WriteString(a.SubtractChars(placeholder, t))
+		} else {
+			builder.WriteString(a.SubtractChars(t, placeholder))
 		}
 	}
+
 	return builder.String()
 }
 
