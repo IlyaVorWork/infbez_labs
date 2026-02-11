@@ -245,7 +245,7 @@ func (a *Trithemius) EncodeMergeBlock(block, key string) string {
 		if i%2 == 1 {
 			sign = -1
 		}
-		sum = (24 + sum + sign*keyArr[i]) % 24
+		sum = ((24+sum+sign*keyArr[i])%24 + 24) % 24
 	}
 	for k := 0; k < 3; k++ {
 		t := sum % (4 - k)
@@ -276,7 +276,7 @@ func (a *Trithemius) DecodeMergeBlock(block, key string) string {
 		if i%2 == 1 {
 			sign = -1
 		}
-		sum = (24 + sum + sign*keyArr[i]) % 24
+		sum = ((24+sum+sign*keyArr[i])%24 + 24) % 24
 	}
 	for k := 0; k < 3; k++ {
 		t := sum % (4 - k)
