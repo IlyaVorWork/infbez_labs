@@ -3,48 +3,47 @@ package main
 import (
 	"fmt"
 	l1 "infbez_labs/Lab1"
+	l2 "infbez_labs/Lab2"
 )
 
 func main() {
-	var TelegraphAlphabet = []rune("АБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЫЬЭЮЯ_")
-
-	lab1 := l1.NewTrithemius(TelegraphAlphabet)
-
 	var (
-		key  string
-		text string
+		TelegraphAlphabet = []rune("АБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЫЬЭЮЯ_")
+
+		InnerState = [4]string{"________________",
+			"ПРОЖЕКТОР_ЧЕПУХИ",
+			"КОЛЫХАТЬ_ПАРОДИЮ",
+			"КАРМАННЫЙ_АТАМАН"}
 	)
 
-	_, err := fmt.Scanln(&text)
-	if err != nil {
-		return
-	}
+	alphabet := *l1.NewAlphabet(TelegraphAlphabet)
+	sponge := l2.NewSponge(InnerState, alphabet)
 
-	_, err = fmt.Scanln(&key)
-	if err != nil {
-		return
-	}
+	var (
+		IN  = "ХОРОШО_БЫТЬ_ВАМИ"
+		IN1 = "КЬЕРГЕГОР_ПРОПАЛ"
+		IN2 = "ХОРОШО_ПРОБРОСИЛ"
+	)
+	fmt.Println(sponge.Confuse(IN, IN1))
+	fmt.Println(sponge.Confuse(IN, IN2))
+	fmt.Println(sponge.Confuse(IN, IN))
 
-	table := lab1.BuildTrithemiusAlphabet(key)
-	fmt.Println(string(table))
-	encodedText := lab1.EncodePolyTrithemius(text, key)
-	decodedText := lab1.DecodePolyTrithemius(encodedText, key)
-	fmt.Println(encodedText)
-	fmt.Println(decodedText)
-
-	encodedSText := lab1.EncodeSTrithemius(text, key)
-	decodedSText := lab1.DecodeSTrithemius(encodedSText, key)
-	fmt.Println(encodedSText)
-	fmt.Println(decodedSText)
-
-	encodeMergeBlock := lab1.EncodeMergeBlock(text, key)
-	decodedMergeBlock := lab1.DecodeMergeBlock(encodeMergeBlock, key)
-	fmt.Println(encodeMergeBlock)
-	fmt.Println(decodedMergeBlock)
-
-	encodedTrithemiusM := lab1.EncodeSTrithemiusM(text, key)
-	decodedTrithemiusM := lab1.DecodeSTrithemiusM(encodedTrithemiusM, key)
-	fmt.Println(encodedTrithemiusM)
-	fmt.Println(decodedTrithemiusM)
-
+	//var (
+	//	IN1 = []string{"ХОРОШО_БЫТЬ_ВАМИ"}
+	//	IN2 = []string{"ХОРОШО_БЫТЬ_ВАМИ", "________________", "________________", "________________"}
+	//	IN3 = []string{"ХОРОШО_БЫТЬ_ВАМИ", "________А_______"}
+	//	IN4 = []string{"ХОРОШО_БЫТЬ_ВАМИ", "КЬЕРГЕГОР_ПРОПАЛ"}
+	//)
+	//
+	//fmt.Println(l2.NewSponge(InnerState, alphabet).CBlock(IN1, 16))
+	//fmt.Println(l2.NewSponge(InnerState, alphabet).CBlock(IN2, 16))
+	//fmt.Println(l2.NewSponge(InnerState, alphabet).CBlock(IN3, 16))
+	//
+	//fmt.Println(l2.NewSponge(InnerState, alphabet).CBlock(IN1, 8))
+	//fmt.Println(l2.NewSponge(InnerState, alphabet).CBlock(IN2, 8))
+	//fmt.Println(l2.NewSponge(InnerState, alphabet).CBlock(IN3, 8))
+	//
+	//fmt.Println(l2.NewSponge(InnerState, alphabet).CBlock(IN4, 16))
+	//fmt.Println(l2.NewSponge(InnerState, alphabet).CBlock(IN4, 8))
+	//fmt.Println(l2.NewSponge(InnerState, alphabet).CBlock(IN4, 4))
 }
