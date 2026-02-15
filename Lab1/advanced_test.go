@@ -138,7 +138,7 @@ func Test_STrithemius_Input(t *testing.T) {
 	)
 	seed := time.Now().UnixNano()
 	rnd := rand.New(rand.NewSource(seed))
-	alphabet := NewTrithemius(TelegraphAlphabet)
+	trithemius := NewTrithemius(TelegraphAlphabet)
 
 	inputs := make([]string, 0, numInputs)
 	keys := make([]string, 0, numKeys)
@@ -166,8 +166,8 @@ func Test_STrithemius_Input(t *testing.T) {
 		for _, p := range inputs {
 			for _, k := range keys {
 				pPrime := makeSmallChangeOnBlock(TelegraphAlphabet, p, rnd)
-				c1 := alphabet.EncodeSTrithemius(p, k)
-				c2 := alphabet.EncodeSTrithemius(pPrime, k)
+				c1 := trithemius.EncodeSTrithemius(p, k)
+				c2 := trithemius.EncodeSTrithemius(pPrime, k)
 				diff := diffPositions(c1, c2)
 
 				res := Result{p, k, c1, c2, diff}
@@ -238,8 +238,8 @@ func Test_STrithemius_Input(t *testing.T) {
 				shift := 1 + rnd.Intn(blockLen-1)
 
 				pPrime := rotateRightRunes(p, shift)
-				c1 := alphabet.EncodeSTrithemius(p, k)
-				c2 := alphabet.EncodeSTrithemius(pPrime, k)
+				c1 := trithemius.EncodeSTrithemius(p, k)
+				c2 := trithemius.EncodeSTrithemius(pPrime, k)
 				same := outputsHaveSameMultiset(c1, c2)
 
 				res := RResult{p, shift, k, c1, c2, same}
@@ -299,15 +299,15 @@ func Test_STrithemius_Input(t *testing.T) {
 				}
 				p1 := inputs[i]
 				p2 := inputs[j]
-				p3 := alphabet.AddTxt(p1, p2)
+				p3 := trithemius.Alphabet.AddTxt(p1, p2)
 				if p3 == p1 || p3 == p2 {
 					continue
 				}
 				for _, k := range keys {
-					c1 := alphabet.EncodeSTrithemius(p1, k)
-					c2 := alphabet.EncodeSTrithemius(p2, k)
-					c3 := alphabet.EncodeSTrithemius(p3, k)
-					c1plus2 := alphabet.AddTxt(c1, c2)
+					c1 := trithemius.EncodeSTrithemius(p1, k)
+					c2 := trithemius.EncodeSTrithemius(p2, k)
+					c3 := trithemius.EncodeSTrithemius(p3, k)
+					c1plus2 := trithemius.Alphabet.AddTxt(c1, c2)
 					diff := diffPositions(c1plus2, c3)
 
 					res := LResult{p1, p2, p3, k, c1, c2, c3, c1plus2, diff}
@@ -522,7 +522,7 @@ func Test_STrithemius_Key(t *testing.T) {
 				}
 				k1 := keys[i]
 				k2 := keys[j]
-				k3 := alphabet.AddTxt(k1, k2)
+				k3 := alphabet.Alphabet.AddTxt(k1, k2)
 				if k3 == k1 || k3 == k2 {
 					continue
 				}
@@ -530,7 +530,7 @@ func Test_STrithemius_Key(t *testing.T) {
 					c1 := alphabet.EncodeSTrithemius(p, k1)
 					c2 := alphabet.EncodeSTrithemius(p, k2)
 					c3 := alphabet.EncodeSTrithemius(p, k3)
-					c1plus2 := alphabet.AddTxt(c1, c2)
+					c1plus2 := alphabet.Alphabet.AddTxt(c1, c2)
 					diff := diffPositions(c1plus2, c3)
 
 					res := LResult{p, k1, k2, k3, c1, c2, c3, c1plus2, diff}
@@ -744,7 +744,7 @@ func Test_MergeBlock_Input(t *testing.T) {
 				}
 				p1 := inputs[i]
 				p2 := inputs[j]
-				p3 := alphabet.AddTxt(p1, p2)
+				p3 := alphabet.Alphabet.AddTxt(p1, p2)
 				if p3 == p1 || p3 == p2 {
 					continue
 				}
@@ -752,7 +752,7 @@ func Test_MergeBlock_Input(t *testing.T) {
 					c1 := alphabet.EncodeMergeBlock(p1, k)
 					c2 := alphabet.EncodeMergeBlock(p2, k)
 					c3 := alphabet.EncodeMergeBlock(p3, k)
-					c1plus2 := alphabet.AddTxt(c1, c2)
+					c1plus2 := alphabet.Alphabet.AddTxt(c1, c2)
 					diff := diffPositions(c1plus2, c3)
 
 					res := LResult{p1, p2, p3, k, c1, c2, c3, c1plus2, diff}
@@ -967,7 +967,7 @@ func Test_MergeBlock_Key(t *testing.T) {
 				}
 				k1 := keys[i]
 				k2 := keys[j]
-				k3 := alphabet.AddTxt(k1, k2)
+				k3 := alphabet.Alphabet.AddTxt(k1, k2)
 				if k3 == k1 || k3 == k2 {
 					continue
 				}
@@ -975,7 +975,7 @@ func Test_MergeBlock_Key(t *testing.T) {
 					c1 := alphabet.EncodeMergeBlock(p, k1)
 					c2 := alphabet.EncodeMergeBlock(p, k2)
 					c3 := alphabet.EncodeMergeBlock(p, k3)
-					c1plus2 := alphabet.AddTxt(c1, c2)
+					c1plus2 := alphabet.Alphabet.AddTxt(c1, c2)
 					diff := diffPositions(c1plus2, c3)
 
 					res := LResult{p, k1, k2, k3, c1, c2, c3, c1plus2, diff}
@@ -1189,7 +1189,7 @@ func Test_STrithemiusM_Input(t *testing.T) {
 				}
 				p1 := inputs[i]
 				p2 := inputs[j]
-				p3 := alphabet.AddTxt(p1, p2)
+				p3 := alphabet.Alphabet.AddTxt(p1, p2)
 				if p3 == p1 || p3 == p2 {
 					continue
 				}
@@ -1197,7 +1197,7 @@ func Test_STrithemiusM_Input(t *testing.T) {
 					c1 := alphabet.EncodeSTrithemiusM(p1, k)
 					c2 := alphabet.EncodeSTrithemiusM(p2, k)
 					c3 := alphabet.EncodeSTrithemiusM(p3, k)
-					c1plus2 := alphabet.AddTxt(c1, c2)
+					c1plus2 := alphabet.Alphabet.AddTxt(c1, c2)
 					diff := diffPositions(c1plus2, c3)
 
 					res := LResult{p1, p2, p3, k, c1, c2, c3, c1plus2, diff}
@@ -1412,7 +1412,7 @@ func Test_STrithemiusM_Key(t *testing.T) {
 				}
 				k1 := keys[i]
 				k2 := keys[j]
-				k3 := alphabet.AddTxt(k1, k2)
+				k3 := alphabet.Alphabet.AddTxt(k1, k2)
 				if k3 == k1 || k3 == k2 {
 					continue
 				}
@@ -1420,7 +1420,7 @@ func Test_STrithemiusM_Key(t *testing.T) {
 					c1 := alphabet.EncodeSTrithemiusM(p, k1)
 					c2 := alphabet.EncodeSTrithemiusM(p, k2)
 					c3 := alphabet.EncodeSTrithemiusM(p, k3)
-					c1plus2 := alphabet.AddTxt(c1, c2)
+					c1plus2 := alphabet.Alphabet.AddTxt(c1, c2)
 					diff := diffPositions(c1plus2, c3)
 
 					res := LResult{p, k1, k2, k3, c1, c2, c3, c1plus2, diff}
