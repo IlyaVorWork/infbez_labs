@@ -1,8 +1,8 @@
-package Lab2_test
+package sponge_test
 
 import (
 	l1 "infbez_labs/Lab1"
-	"infbez_labs/Lab2"
+	l2 "infbez_labs/Lab2"
 	"strings"
 	"testing"
 )
@@ -11,7 +11,7 @@ func TestSponge_CBlock(t *testing.T) {
 	var (
 		TelegraphAlphabet = []rune("АБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЫЬЭЮЯ_")
 		alphabet          = *l1.NewAlphabet(TelegraphAlphabet)
-		sponge            = Lab2.NewSponge(Lab2.SpongeInnerState, alphabet)
+		sponge            = l2.NewSponge(l2.SpongeInnerState, alphabet)
 
 		IN1 = []string{"ХОРОШО_БЫТЬ_ВАМИ"}
 		IN2 = []string{"ХОРОШО_БЫТЬ_ВАМИ", "________________", "________________", "________________"}
@@ -158,7 +158,7 @@ func TestSponge_MixCols_ShatterBlocks_ShiftRows(t *testing.T) {
 			{"____", "____", "____", "____", "____"},
 		}
 
-		sponge = Lab2.NewSponge(state0, alphabet)
+		sponge = l2.NewSponge(state0, alphabet)
 
 		state11 = [5][5]string{
 			{"__М_", "__А_", "__В_", "__М_", "__Т_"},
@@ -311,7 +311,7 @@ func TestSponge_SpongeAbsorb(t *testing.T) {
 			{"____", "____", "____", "____", "____"},
 		}
 
-		sponge = Lab2.NewSponge(state0, alphabet)
+		sponge = l2.NewSponge(state0, alphabet)
 
 		IN1 = "_А__"
 		IN2 = "ВИЛЯ"
@@ -387,7 +387,7 @@ func TestSponge_SpongeSqueeze(t *testing.T) {
 			{"Ы_ЩБ", "____", "Ф_ЕЮ", "Ы_ЩБ", "Д_ЕЮ"},
 		}
 
-		sponge = Lab2.NewSponge(stateX, alphabet)
+		sponge = l2.NewSponge(stateX, alphabet)
 
 		OUT1 = "ШНОТ"
 		OUT2 = "НБНЮ"
@@ -464,7 +464,7 @@ func TestSponge_Hash(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := Lab2.SpongeHash(tt.input, alphabet)
+			got := l2.SpongeHash(tt.input, alphabet)
 
 			if tt.output != got {
 				t.Errorf("Failed Sponge Hash, want %v but return %v", tt.output, got)
@@ -476,8 +476,8 @@ func TestSponge_Hash(t *testing.T) {
 
 	for _, tt := range subTests {
 		t.Run(tt.name, func(t *testing.T) {
-			got1 := Lab2.SpongeHash(tt.input1, alphabet)
-			got2 := Lab2.SpongeHash(tt.input2, alphabet)
+			got1 := l2.SpongeHash(tt.input1, alphabet)
+			got2 := l2.SpongeHash(tt.input2, alphabet)
 			subGot := alphabet.SubTxt(got1, got2)
 
 			if tt.output != subGot {

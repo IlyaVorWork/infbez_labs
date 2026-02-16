@@ -1,4 +1,4 @@
-package Lab2
+package sponge
 
 import (
 	l1 "infbez_labs/Lab1"
