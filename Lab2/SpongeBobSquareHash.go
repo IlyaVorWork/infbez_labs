@@ -52,7 +52,7 @@ func (s *Sponge) CBlock(inArr []string, outSize int) string {
 			panic("ошибка входных данных: строка должна быть длиной 16 символов")
 		}
 	}
-	innerState[1] = s.Alphabet.AddTxt(innerState[1], inArr[0])
+	innerState = s.mixInnerStateCBlock(innerState)
 	TMP1 := s.CoreTrithemius(innerState[0], innerState[2])
 	TMP2 := s.CoreTrithemius(innerState[3], innerState[1])
 	TMP3 := s.Confuse(TMP1, TMP2)
@@ -69,7 +69,20 @@ func (s *Sponge) Confuse(In1, In2 string) string {
 	for i := 0; i < 16; i++ {
 		arr1[i] = (max(arr1[i], arr2[i]) + i) % s.Alphabet.AlphabetLength
 	}
-	return s.Alphabet.ArrayToText(arr1)
+	result := s.Alphabet.ArrayToText(arr1)
+
+	return s.Alphabet.AddTxt(s.Alphabet.AddTxt(result, In1), In2)
+}
+
+func (s *Sponge) mixInnerStateCBlock(In [4]string) [4]string {
+	var newInnerState = [4]string(make([]string, 4))
+
+	newInnerState[0] = s.Alphabet.AddTxt(In[0], In[1])
+	newInnerState[1] = s.Alphabet.SubTxt(In[0], In[1])
+	newInnerState[2] = s.Alphabet.AddTxt(newInnerState[1], s.Alphabet.AddTxt(In[2], In[3]))
+	newInnerState[3] = s.Alphabet.AddTxt(newInnerState[0], s.Alphabet.SubTxt(In[2], In[3]))
+
+	return newInnerState
 }
 
 func (s *Sponge) Compress(In16 string, outN int) string {
@@ -158,7 +171,7 @@ func (s *Sponge) ShiftRows() [5][5]string {
 
 func (s *Sponge) SpongeAbsorb(inputBlock string) [5][5]string {
 	var columnSums [5]string
-	var str2 = concatStrings([]string{inputBlock, s.InnerState[0][0], inputBlock, s.InnerState[0][0]}, 16)
+	var str1 = concatStrings([]string{inputBlock, s.InnerState[0][0], inputBlock, s.InnerState[0][0]}, 16)
 
 	for i := 0; i < 5; i++ {
 		columnSums[i] = "____"
@@ -166,7 +179,7 @@ func (s *Sponge) SpongeAbsorb(inputBlock string) [5][5]string {
 			columnSums[i] = s.Alphabet.AddTxt(columnSums[i], s.InnerState[i][j])
 		}
 	}
-	str1 := concatStrings([]string{columnSums[0], columnSums[1], columnSums[2], columnSums[3]}, 16)
+	str2 := concatStrings([]string{columnSums[0], columnSums[1], columnSums[2], columnSums[3]}, 16)
 
 	s.InnerState[0][0] = s.CBlock([]string{str1, str2}, 4)
 	s.MixCols()
