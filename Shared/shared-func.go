@@ -1,6 +1,7 @@
-package trithemius
+package Shared
 
 import (
+	"math"
 	"strings"
 )
 
@@ -123,4 +124,65 @@ func (a *Alphabet) SubTxt(txt1, txt2 string) string {
 	}
 
 	return builder.String()
+}
+
+func (a *Alphabet) BlockToNum(block string) int {
+	runeBlock := []rune(block)
+	if len(runeBlock) != 4 {
+		panic("BlockToNum: вход имеет неверную длину")
+	}
+	pos := 1
+	temp := a.TextToArray(block)
+	var out int
+	for i := 3; i >= 0; i-- {
+		out = pos*temp[i] + out
+		pos = 32 * pos
+	}
+	return out
+}
+
+func (a *Alphabet) div(dividend, divisor int) int {
+	return int(math.Trunc(float64(dividend) / float64(divisor)))
+}
+
+func (a *Alphabet) NumToBlock(num int) string {
+	rem := num
+	temp := [4]int{}
+	for i := 0; i < 4; i++ {
+		temp[3-i] = rem % 32
+		rem = a.div(rem, 32)
+	}
+	return a.ArrayToText(temp[:])
+}
+
+func (a *Alphabet) DecToBin(num int) []int {
+	rem := num
+	out := make([]int, 20)
+	for i := 0; i < 20; i++ {
+		out[19-i] = rem % 2
+		rem = a.div(rem, 2)
+	}
+	return out[:]
+}
+
+func (a *Alphabet) BinToDec(nums []int) int {
+	out := 0
+	for i := 0; i < len(nums); i++ {
+		out = out*2 + nums[i]
+	}
+	return out
+}
+
+func (a *Alphabet) BlockToBin(block string) []int {
+	temp := a.BlockToNum(block)
+	return a.DecToBin(temp)
+}
+
+func (a *Alphabet) BinToBlock(bin []int) string {
+	temp := a.BinToDec(bin)
+	return a.NumToBlock(temp)
+}
+
+func (a *Alphabet) PushReg(bin []int, bool_in int) []int {
+	return append(bin[1:], bool_in)
 }

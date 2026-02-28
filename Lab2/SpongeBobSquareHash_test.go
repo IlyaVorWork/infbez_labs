@@ -1,8 +1,8 @@
 package sponge_test
 
 import (
-	l1 "infbez_labs/Lab1"
 	l2 "infbez_labs/Lab2"
+	l1 "infbez_labs/Shared"
 	"strings"
 	"testing"
 )

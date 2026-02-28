@@ -5,7 +5,7 @@ import (
 	"gonum.org/v1/plot"
 	"gonum.org/v1/plot/plotter"
 	"gonum.org/v1/plot/vg"
-	trithemius "infbez_labs/Lab1"
+	trithemius "infbez_labs/Shared"
 	"math/rand"
 	"testing"
 	"time"
