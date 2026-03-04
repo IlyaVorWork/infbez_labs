@@ -2,7 +2,7 @@ package hash
 
 import (
 	"fmt"
-	trithemius "infbez_labs/internal/alphabet"
+	alpha "infbez_labs/internal/alphabet"
 	"math/rand"
 	"testing"
 	"time"
@@ -58,7 +58,7 @@ func Test_SpongeHash_Random(t *testing.T) {
 	)
 	seed := time.Now().UnixNano()
 	rnd := rand.New(rand.NewSource(seed))
-	alphabet := trithemius.NewAlphabet(TelegraphAlphabet)
+	alphabet := alpha.NewAlphabet(TelegraphAlphabet)
 
 	inputs := make([]string, 0, numInputs)
 	for i := 0; i < numInputs; i++ {
