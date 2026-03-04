@@ -1,13 +1,12 @@
-package trithemius
+package cipher_test
 
 import (
 	"fmt"
+	"infbez_labs/internal/cipher"
 	"math/rand"
 	"testing"
 	"time"
 )
-
-var TelegraphAlphabet = []rune("АБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЫЬЭЮЯ_")
 
 func indexOf(runes []rune, r rune) int {
 	for i, v := range runes {
@@ -138,7 +137,7 @@ func Test_STrithemius_Input(t *testing.T) {
 	)
 	seed := time.Now().UnixNano()
 	rnd := rand.New(rand.NewSource(seed))
-	trithemius := NewTrithemius(TelegraphAlphabet)
+	trithemius := cipher.NewTrithemius(TelegraphAlphabet)
 
 	inputs := make([]string, 0, numInputs)
 	keys := make([]string, 0, numKeys)
@@ -361,7 +360,7 @@ func Test_STrithemius_Key(t *testing.T) {
 	)
 	seed := time.Now().UnixNano()
 	rnd := rand.New(rand.NewSource(seed))
-	alphabet := NewTrithemius(TelegraphAlphabet)
+	alphabet := cipher.NewTrithemius(TelegraphAlphabet)
 
 	inputs := make([]string, 0, numInputs)
 	keys := make([]string, 0, numKeys)
@@ -583,7 +582,7 @@ func Test_MergeBlock_Input(t *testing.T) {
 	)
 	seed := time.Now().UnixNano()
 	rnd := rand.New(rand.NewSource(seed))
-	alphabet := NewTrithemius(TelegraphAlphabet)
+	alphabet := cipher.NewTrithemius(TelegraphAlphabet)
 
 	inputs := make([]string, 0, numInputs)
 	keys := make([]string, 0, numKeys)
@@ -806,7 +805,7 @@ func Test_MergeBlock_Key(t *testing.T) {
 	)
 	seed := time.Now().UnixNano()
 	rnd := rand.New(rand.NewSource(seed))
-	alphabet := NewTrithemius(TelegraphAlphabet)
+	alphabet := cipher.NewTrithemius(TelegraphAlphabet)
 
 	inputs := make([]string, 0, numInputs)
 	keys := make([]string, 0, numKeys)
@@ -1028,7 +1027,7 @@ func Test_STrithemiusM_Input(t *testing.T) {
 	)
 	seed := time.Now().UnixNano()
 	rnd := rand.New(rand.NewSource(seed))
-	alphabet := NewTrithemius(TelegraphAlphabet)
+	alphabet := cipher.NewTrithemius(TelegraphAlphabet)
 
 	inputs := make([]string, 0, numInputs)
 	keys := make([]string, 0, numKeys)
@@ -1251,7 +1250,7 @@ func Test_STrithemiusM_Key(t *testing.T) {
 	)
 	seed := time.Now().UnixNano()
 	rnd := rand.New(rand.NewSource(seed))
-	alphabet := NewTrithemius(TelegraphAlphabet)
+	alphabet := cipher.NewTrithemius(TelegraphAlphabet)
 
 	inputs := make([]string, 0, numInputs)
 	keys := make([]string, 0, numKeys)

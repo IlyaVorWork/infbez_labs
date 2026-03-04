@@ -1,4 +1,4 @@
-package Shared
+package alphabet
 
 import (
 	"math"

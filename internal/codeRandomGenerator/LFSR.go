@@ -1,8 +1,8 @@
-package Lab3
+package codeRandomGenerator
 
 import (
-	sponge "infbez_labs/Lab2"
-	"infbez_labs/Shared"
+	"infbez_labs/internal/alphabet"
+	sponge "infbez_labs/internal/hash"
 	"slices"
 	"strings"
 )
@@ -27,7 +27,7 @@ func InitializePRNG(seed string) []string {
 		"ЧЕТВЕРТЫЙ_ГОБЛИН",
 	}
 
-	Alphabet := Shared.NewAlphabet(TelegraphAlphabet)
+	Alphabet := alphabet.NewAlphabet(TelegraphAlphabet)
 	SpongeBob := sponge.NewSponge(SpongeInnerState, *Alphabet)
 
 	value := [4]string{}
@@ -51,10 +51,10 @@ func InitializePRNG(seed string) []string {
 }
 
 type LFSR struct {
-	Alphabet Shared.Alphabet
+	Alphabet alphabet.Alphabet
 }
 
-func NewLFSR(Alphabet Shared.Alphabet) *LFSR {
+func NewLFSR(Alphabet alphabet.Alphabet) *LFSR {
 	return &LFSR{Alphabet}
 }
 
