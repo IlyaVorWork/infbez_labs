@@ -1,14 +1,15 @@
-package sponge
+package hash
 
 import (
 	"fmt"
-	"gonum.org/v1/plot"
-	"gonum.org/v1/plot/plotter"
-	"gonum.org/v1/plot/vg"
-	trithemius "infbez_labs/Lab1"
+	trithemius "infbez_labs/internal/alphabet"
 	"math/rand"
 	"testing"
 	"time"
+
+	"gonum.org/v1/plot"
+	"gonum.org/v1/plot/plotter"
+	"gonum.org/v1/plot/vg"
 )
 
 var TelegraphAlphabet = []rune("АБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЫЬЭЮЯ_")
@@ -30,7 +31,7 @@ func indexOf(runes []rune, r rune) int {
 	return -1
 }
 
-func smallChangeRune(alpha []rune, r rune, rnd *rand.Rand) rune {
+func smallChangeRune(alpha []rune, r rune) rune {
 	idx := indexOf(alpha, r)
 	if idx == -1 {
 		return r
@@ -46,7 +47,7 @@ func makeSmallChangeOnBlock(alpha []rune, block string, rnd *rand.Rand) string {
 		return block
 	}
 	i := rnd.Intn(len(runes))
-	runes[i] = smallChangeRune(alpha, runes[i], rnd)
+	runes[i] = smallChangeRune(alpha, runes[i])
 	return string(runes)
 }
 
@@ -115,7 +116,7 @@ func BuildHistogram(frequencies []int, alphabet []rune) {
 
 	p.NominalX(labels...)
 
-	if err := p.Save(6*vg.Inch, 4*vg.Inch, "barchart.png"); err != nil {
+	if err := p.Save(6*vg.Inch, 4*vg.Inch, "../../sources/barchart.png"); err != nil {
 		panic(err)
 	}
 }

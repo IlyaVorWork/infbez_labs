@@ -1,8 +1,8 @@
-package trithemius_test
+package cipher_test
 
 import (
 	"fmt"
-	l1 "infbez_labs/Lab1"
+	"infbez_labs/internal/cipher"
 	"slices"
 	"testing"
 )
@@ -10,7 +10,7 @@ import (
 var TelegraphAlphabet = []rune("АБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЫЬЭЮЯ_")
 
 func TestTrithemius_BuildTrithemiusAlphabet(t *testing.T) {
-	trithemius := l1.NewTrithemius(TelegraphAlphabet)
+	trithemius := cipher.NewTrithemius(TelegraphAlphabet)
 
 	var (
 		K1 = "ДИНОЗАВР_ЗАУРОПОД"
@@ -46,7 +46,7 @@ func TestTrithemius_BuildTrithemiusAlphabet(t *testing.T) {
 }
 
 func TestTrithemius_GetCharByKey(t *testing.T) {
-	trithemius := l1.NewTrithemius(TelegraphAlphabet)
+	trithemius := cipher.NewTrithemius(TelegraphAlphabet)
 
 	var (
 		Key1 = 0
@@ -86,7 +86,7 @@ func TestTrithemius_GetCharByKey(t *testing.T) {
 }
 
 func TestTrithemius_GetKeyByChar(t *testing.T) {
-	trithemius := l1.NewTrithemius(TelegraphAlphabet)
+	trithemius := cipher.NewTrithemius(TelegraphAlphabet)
 
 	var (
 		InputChar1 = "_"
@@ -125,7 +125,7 @@ func TestTrithemius_GetKeyByChar(t *testing.T) {
 }
 
 func TestTrithemius_AddTxt(t *testing.T) {
-	trithemius := l1.NewTrithemius(TelegraphAlphabet)
+	trithemius := cipher.NewTrithemius(TelegraphAlphabet)
 	var (
 		TT1 = "ЕЖИК"
 		TT2 = "В_ТУМАНЕ"
@@ -156,7 +156,7 @@ func TestTrithemius_AddTxt(t *testing.T) {
 }
 
 func TestTrithemius_SubTxt(t *testing.T) {
-	trithemius := l1.NewTrithemius(TelegraphAlphabet)
+	trithemius := cipher.NewTrithemius(TelegraphAlphabet)
 	var (
 		TT1 = "ЕЖИК"
 		TT2 = "В_ТУМАНЕ"
@@ -188,7 +188,7 @@ func TestTrithemius_SubTxt(t *testing.T) {
 }
 
 func TestTrithemius_ArrayToText(t *testing.T) {
-	trithemius := l1.NewTrithemius(TelegraphAlphabet)
+	trithemius := cipher.NewTrithemius(TelegraphAlphabet)
 
 	var (
 		IN1 = []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 0}
@@ -231,7 +231,7 @@ func TestTrithemius_ArrayToText(t *testing.T) {
 }
 
 func TestTrithemius_TextToArray(t *testing.T) {
-	trithemius := l1.NewTrithemius(TelegraphAlphabet)
+	trithemius := cipher.NewTrithemius(TelegraphAlphabet)
 
 	var (
 		IN1 = "АБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЫЬЭЮЯ_"
@@ -274,7 +274,7 @@ func TestTrithemius_TextToArray(t *testing.T) {
 }
 
 func TestTrithemius_EncodeTrithemius_BasicTests(t *testing.T) {
-	trithemius := l1.NewTrithemius(TelegraphAlphabet)
+	trithemius := cipher.NewTrithemius(TelegraphAlphabet)
 
 	var (
 		IN = "ГОЛОВНОЙ_ОФИС"
@@ -317,7 +317,7 @@ func TestTrithemius_EncodeTrithemius_BasicTests(t *testing.T) {
 }
 
 func TestTrithemius_DecodeTrithemius_BasicTests(t *testing.T) {
-	trithemius := l1.NewTrithemius(TelegraphAlphabet)
+	trithemius := cipher.NewTrithemius(TelegraphAlphabet)
 
 	var (
 		IN1 = "ФАЮАМЫАЬТА_ЩБ"
@@ -360,7 +360,7 @@ func TestTrithemius_DecodeTrithemius_BasicTests(t *testing.T) {
 }
 
 func TestTrithemius_ShiftTrithemiusAlphabet(t *testing.T) {
-	trithemius := l1.NewTrithemius(TelegraphAlphabet)
+	trithemius := cipher.NewTrithemius(TelegraphAlphabet)
 
 	var (
 		table = trithemius.BuildTrithemiusAlphabet("ХОРОШО_БЫТЬ_ВАМИ")
@@ -412,7 +412,7 @@ func TestTrithemius_ShiftTrithemiusAlphabet(t *testing.T) {
 }
 
 func TestTrithemius_EncodePolyTrithemius(t *testing.T) {
-	trithemius := l1.NewTrithemius(TelegraphAlphabet)
+	trithemius := cipher.NewTrithemius(TelegraphAlphabet)
 
 	var (
 		IN1 = "ОТКРЫТЫЙ_ТЕКСТ"
@@ -458,7 +458,7 @@ func TestTrithemius_EncodePolyTrithemius(t *testing.T) {
 }
 
 func TestTrithemius_DecodePolyTrithemius_BasicTests(t *testing.T) {
-	trithemius := l1.NewTrithemius(TelegraphAlphabet)
+	trithemius := cipher.NewTrithemius(TelegraphAlphabet)
 
 	var (
 		In1 = "ЭХЩКДХЖШСХУВНХ"
@@ -505,7 +505,7 @@ func TestTrithemius_DecodePolyTrithemius_BasicTests(t *testing.T) {
 }
 
 func TestTrithemius_EncodeSTrithemius_BasicTests(t *testing.T) {
-	trithemius := l1.NewTrithemius(TelegraphAlphabet)
+	trithemius := cipher.NewTrithemius(TelegraphAlphabet)
 
 	var (
 		IN1 = "БЛОК"
@@ -550,7 +550,7 @@ func TestTrithemius_EncodeSTrithemius_BasicTests(t *testing.T) {
 }
 
 func TestTrithemius_DecodeSTrithemius_BasicTests(t *testing.T) {
-	trithemius := l1.NewTrithemius(TelegraphAlphabet)
+	trithemius := cipher.NewTrithemius(TelegraphAlphabet)
 
 	var (
 		In1 = "БЛОК"
@@ -598,7 +598,7 @@ func TestTrithemius_DecodeSTrithemius_BasicTests(t *testing.T) {
 }
 
 func TestTrithemius_EncodeMergeBlock(t *testing.T) {
-	trithemius := l1.NewTrithemius(TelegraphAlphabet)
+	trithemius := cipher.NewTrithemius(TelegraphAlphabet)
 
 	var (
 		In1 = "БЛОК"
@@ -644,7 +644,7 @@ func TestTrithemius_EncodeMergeBlock(t *testing.T) {
 }
 
 func TestTrithemius_DecodeMergeBlock(t *testing.T) {
-	trithemius := l1.NewTrithemius(TelegraphAlphabet)
+	trithemius := cipher.NewTrithemius(TelegraphAlphabet)
 
 	var (
 		In1 = "БЛОК"
@@ -700,7 +700,7 @@ func TestTrithemius_DecodeMergeBlock(t *testing.T) {
 }
 
 func TestTrithemius_EncodeSTrithemiusM_BasicTests(t *testing.T) {
-	trithemius := l1.NewTrithemius(TelegraphAlphabet)
+	trithemius := cipher.NewTrithemius(TelegraphAlphabet)
 
 	var (
 		IN1 = "БЛОК"
@@ -737,7 +737,7 @@ func TestTrithemius_EncodeSTrithemiusM_BasicTests(t *testing.T) {
 }
 
 func TestTrithemius_DecodeSTrithemiusM_BasicTests(t *testing.T) {
-	trithemius := l1.NewTrithemius(TelegraphAlphabet)
+	trithemius := cipher.NewTrithemius(TelegraphAlphabet)
 
 	var (
 		IN1 = "БЛОК"

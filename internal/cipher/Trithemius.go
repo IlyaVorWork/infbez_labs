@@ -1,21 +1,27 @@
-package trithemius
+package cipher
 
 import (
+	"infbez_labs/internal/alphabet"
 	"slices"
 )
 
-// Trithemius TODO Убрать магические числа в коде (осталась длина алфавита)
-type Trithemius struct {
-	Alphabet *Alphabet
-}
+const (
+	DefaultShift     = 8
+	AlphabetSize     = 32
+	ShortBlockLength = 4
+	FullKeyLength    = 16
+	MergeSum         = 24
+)
 
-const DefaultShift int = 8
+type Trithemius struct {
+	Alphabet *alphabet.Alphabet
+}
 
 func NewTrithemius(TelegraphAlphabet []rune) *Trithemius {
-	return &Trithemius{NewAlphabet(TelegraphAlphabet)}
+	return &Trithemius{alphabet.NewAlphabet(TelegraphAlphabet)}
 }
 
-func NewTrithemiusWithReadyAlphabet(Alphabet Alphabet) *Trithemius {
+func NewTrithemiusWithReadyAlphabet(Alphabet alphabet.Alphabet) *Trithemius {
 	return &Trithemius{Alphabet: &Alphabet}
 }
 

@@ -1,7 +1,8 @@
-package sponge
+package hash
 
 import (
-	l1 "infbez_labs/Lab1"
+	"infbez_labs/internal/alphabet"
+	l1 "infbez_labs/internal/cipher"
 	"strings"
 )
 
@@ -24,10 +25,10 @@ var (
 
 type Sponge struct {
 	InnerState [5][5]string
-	Alphabet   l1.Alphabet
+	Alphabet   alphabet.Alphabet
 }
 
-func NewSponge(InnerState [5][5]string, Alphabet l1.Alphabet) *Sponge {
+func NewSponge(InnerState [5][5]string, Alphabet alphabet.Alphabet) *Sponge {
 	return &Sponge{InnerState, Alphabet}
 }
 
@@ -205,7 +206,7 @@ func (s *Sponge) SpongeSqueeze() string {
 	return s.CBlock([]string{str}, 4)
 }
 
-func SpongeHash(message string, alphabet l1.Alphabet) string {
+func SpongeHash(message string, alphabet alphabet.Alphabet) string {
 	messageLen := len([]rune(message))
 	sponge := NewSponge(SpongeInnerState, alphabet)
 	var builder strings.Builder
