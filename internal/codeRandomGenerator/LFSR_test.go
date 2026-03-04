@@ -502,40 +502,113 @@ func TestPRNG_AS_LFSR_Push(t *testing.T) {
 	})
 }
 
-//func TestPRNG_AS_LFSR_Next(t *testing.T) {
-//
-//	var (
-//		lfsr = generator.NewLFSR(*alphabet)
-//
-//		seed1 = alphabet.BlockToBin("ЛЕРА")
-//		seed2 = alphabet.BlockToBin("КЛОН")
-//		seed3 = alphabet.BlockToBin("КОНЯ")
-//
-//		T1 = []int{1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
-//		T2 = []int{0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0}
-//		T3 = []int{0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
-//
-//		T_set = [][]int{T1, T2, T3}
-//		S_set = [][]int{seed1, seed2, seed3}
-//
-//		Out1 = []int{0, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 1}
-//		Out2 = []int{1, 1, 0, 1, 1, 0, 0, 0, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1}
-//		Out3 = []int{1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0}
-//
-//		Out_set = [][]int{Out1, Out2, Out3}
-//	)
-//
-//	t.Run("AS_LFSR_Push", func(t *testing.T) {
-//		lfsr = generator.NewLFSR(*alphabet)
-//		kod1, got1 := lfsr.ASLFSR_Next(S_set, T_set)
-//		if kod1 != 1 || kod2 != 1 || kod3 != 0 {
-//			t.Errorf("Failed AS_LFSR_Next((input=%q, input2=%q), want %v but return %v", S_set, T_set, Out_set, got3)
-//			return
-//		}
-//
-//		if !reflect.DeepEqual(Out_set, got3) {
-//			t.Errorf("Failed AS_LFSR_Next((input=%q, input2=%q), want %v but return %v", S_set, T_set, Out_set, got3)
-//			return
-//		}
-//	})
-//}
+func TestPRNG_AS_LFSR_Next(t *testing.T) {
+
+	var (
+		lfsr = generator.NewLFSR(*alphabet)
+
+		seed1 = alphabet.BlockToBin("ЛЕРА")
+		seed2 = alphabet.BlockToBin("КЛОН")
+		seed3 = alphabet.BlockToBin("КОНЯ")
+
+		T1 = []int{1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+		T2 = []int{0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0}
+		T3 = []int{0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+
+		TSet = [][]int{T1, T2, T3}
+		SSet = [][]int{seed1, seed2, seed3}
+
+		OutSet = []string{
+			"ОРЩИ",
+			"ЙАУС",
+			"_ШИИ",
+			"ЦЕЖГ",
+			"БЬМЗ",
+			"ОЯРЙ",
+			"ДЯТЩ",
+			"ИСЭП",
+			"РЧУШ",
+		}
+	)
+
+	t.Run("AS_LFSR_Push", func(t *testing.T) {
+		lfsr = generator.NewLFSR(*alphabet)
+		streams := [10][]int{}
+		stateSets := [10][][]int{}
+		streams[0], stateSets[0] = lfsr.ASLFSR_Next(SSet, TSet)
+
+		for i := 1; i < 10; i++ {
+			streams[i], stateSets[i] = lfsr.ASLFSR_Next(stateSets[i-1], TSet)
+		}
+
+		got := make([]string, 9)
+		for i := 1; i < 10; i++ {
+			got[i-1] = alphabet.BinToBlock(streams[i])
+		}
+
+		if !reflect.DeepEqual(OutSet, got) {
+			t.Errorf("Failed AS_LFSR_Next((input=%q, input2=%q), want %v but return %v", SSet, TSet, OutSet, got)
+			return
+		}
+	})
+}
+
+func TestPRNG_C_AS_LFSR_Next(t *testing.T) {
+
+	var (
+		lfsr = generator.NewLFSR(*alphabet)
+
+		SET = [][][]int{
+			{
+				lfsr.TapsToBin([]int{19, 18}),
+				lfsr.TapsToBin([]int{18, 7}),
+				lfsr.TapsToBin([]int{17, 3}),
+			},
+			{
+				lfsr.TapsToBin([]int{19, 18}),
+				lfsr.TapsToBin([]int{18, 7}),
+				lfsr.TapsToBin([]int{16, 14, 13, 11}),
+			},
+			{
+				lfsr.TapsToBin([]int{19, 18}),
+				lfsr.TapsToBin([]int{18, 7}),
+				lfsr.TapsToBin([]int{15, 13, 12, 10}),
+			},
+			{
+				lfsr.TapsToBin([]int{19, 18}),
+				lfsr.TapsToBin([]int{18, 7}),
+				lfsr.TapsToBin([]int{14, 5, 3, 1}),
+			},
+		}
+
+		seed = "АБВГДЕЖЗИЙКЛМНОП"
+
+		Out    = make([]string, 9)
+		Intern = make([][][][]int, 9)
+
+		Output = []string{
+			"ЙЮЬХЖХРЬБЦБЬЧРЫ_",
+			"ЧЖЙЕЭНЭДГХЛЛИЧЛЛ",
+			"ПЙТН_ПХВЕФШИТ_СП",
+			"ЙЯЧСНБКГЦЩЦФЮ_БЦ",
+			"ВНРЬЛНАМЯХОЕКЕАЭ",
+			"ЫММЮЗЯБМЩЙХИБЧИО",
+			"ЯБ_ЭТЩНЙЦЫАМКЛВО",
+			"ЬАЭАВЩЛОЖЭВЖЬЙНЬ",
+			"ГЛЮШРЙЙЕТЖЗЦБКЫА",
+		}
+	)
+
+	t.Run("C_AS_LFSR_Next", func(t *testing.T) {
+		Out[0], Intern[0] = lfsr.WrapCAsLfsrNext("up", [][][]int{}, seed, SET)
+
+		for i := 1; i < 9; i++ {
+			Out[i], Intern[i] = lfsr.WrapCAsLfsrNext("down", Intern[i-1], seed, SET)
+		}
+
+		if !reflect.DeepEqual(Output, Out) {
+			t.Errorf("Failed C_AS_LFSR_Next, want %v but return %v", Output, Out)
+			return
+		}
+	})
+}
