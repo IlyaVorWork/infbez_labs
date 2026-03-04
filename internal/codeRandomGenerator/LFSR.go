@@ -127,7 +127,7 @@ func (l *LFSR) ASLFSR_Next(state, taps [][]int) ([]int, [][]int) {
 	return stream[:], stateSet
 }
 
-func (l *LFSR) Wrap_CASLFSR_Next(initFlag string, stateIn [][][]int, seed string, tapsSet [][][]int) (string, [][][]int) {
+func (l *LFSR) WrapCAsLfsrNext(initFlag string, stateIn [][][]int, seed string, tapsSet [][][]int) (string, [][][]int) {
 	var state [][][]int
 	var stream strings.Builder
 	if initFlag == "up" {
