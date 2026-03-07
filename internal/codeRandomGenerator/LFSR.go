@@ -2,21 +2,10 @@ package codeRandomGenerator
 
 import (
 	"infbez_labs/internal/alphabet"
-	sponge "infbez_labs/internal/hash"
+	"infbez_labs/internal/core"
+	hasher "infbez_labs/internal/hash"
 	"slices"
 	"strings"
-)
-
-var (
-	TelegraphAlphabet = []rune("АБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЫЬЭЮЯ_")
-
-	SpongeInnerState = [5][5]string{
-		{"____", "____", "____", "____", "____"},
-		{"____", "____", "____", "____", "____"},
-		{"____", "____", "____", "____", "____"},
-		{"____", "____", "____", "____", "____"},
-		{"____", "____", "____", "____", "____"},
-	}
 )
 
 func InitializePRNG(seed string) []string {
@@ -27,14 +16,15 @@ func InitializePRNG(seed string) []string {
 		"ЧЕТВЕРТЫЙ_ГОБЛИН",
 	}
 
-	Alphabet := alphabet.NewAlphabet(TelegraphAlphabet)
-	SpongeBob := sponge.NewSponge(SpongeInnerState, *Alphabet)
+	Alphabet := alphabet.NewAlphabet(alphabet.TelegraphAlphabet)
+	cBLock := core.NewCBlock(*Alphabet)
+	SpongeBob := hasher.NewSponge(hasher.SpongeStarterState, *Alphabet, *cBLock)
 
 	value := [4]string{}
 	for i := 0; i < 4; i++ {
-		value[i] = SpongeBob.CBlock([]string{STATE[i], seed}, 16)
+		value[i] = SpongeBob.CBlock.Run([]string{STATE[i], seed}, 16)
 	}
-	secret := SpongeBob.CBlock(value[:], 16)
+	secret := SpongeBob.CBlock.Run(value[:], 16)
 
 	out := [4]string{}
 	for i := 0; i < 4; i++ {
@@ -42,7 +32,7 @@ func InitializePRNG(seed string) []string {
 		TEMP := ""
 		for j := 0; j < 4; j++ {
 			temp = Alphabet.AddTxt(temp, STATE[i])
-			TEMP += SpongeBob.CBlock([]string{temp, secret}, 4)
+			TEMP += SpongeBob.CBlock.Run([]string{temp, secret}, 4)
 			temp = Alphabet.AddTxt(temp, TEMP)
 		}
 		out[i] = string([]rune(TEMP)[4:16])
@@ -58,8 +48,8 @@ func NewLFSR(Alphabet alphabet.Alphabet) *LFSR {
 	return &LFSR{Alphabet}
 }
 
-func (l *LFSR) TapsToBin(taps_in []int) []int {
-	taps := taps_in
+func (l *LFSR) TapsToBin(tapsIn []int) []int {
+	taps := tapsIn
 	slices.Sort(taps)
 	slices.Reverse(taps)
 

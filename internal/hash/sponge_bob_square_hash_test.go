@@ -2,6 +2,7 @@ package hash_test
 
 import (
 	alpha "infbez_labs/internal/alphabet"
+	"infbez_labs/internal/core"
 	"infbez_labs/internal/hash"
 	"strings"
 	"testing"
@@ -9,67 +10,69 @@ import (
 
 func TestSponge_CBlock(t *testing.T) {
 	var (
-		TelegraphAlphabet = []rune("АБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЫЬЭЮЯ_")
-		alphabet          = *alpha.NewAlphabet(TelegraphAlphabet)
-		sponge            = hash.NewSponge(hash.SpongeInnerState, alphabet)
+		alphabet = alpha.NewAlphabet(alpha.TelegraphAlphabet)
+		cBlock   = core.NewCBlock(*alphabet)
+		sponge   = hash.NewSponge(hash.SpongeStarterState, *alphabet, *cBlock)
 
 		IN1 = []string{"ХОРОШО_БЫТЬ_ВАМИ"}
 		IN2 = []string{"ХОРОШО_БЫТЬ_ВАМИ", "________________", "________________", "________________"}
 		IN3 = []string{"ХОРОШО_БЫТЬ_ВАМИ", "________А_______"}
+		IN4 = []string{"ХОРОШО_БЫТЬ_ВАМИ", "___А____________"}
 
-		IN1_16OUT = "ВУГТБТЩЩЬБЩШЕЗЛМ"
-		IN2_16OUT = "ВУГТБТЩЩЬБЩШЕЗЛМ"
-		IN3_16OUT = "ЫХВТАСЩШЬБШШНЗЛМ"
+		IN1_16OUT = "ОВПВР_ЗШЛНУИНПЮД"
+		IN2_16OUT = "ОВПВР_ЗШЛНУИНПЮД"
+		IN3_16OUT = "О_ТСР_ПКЬНГФНТХА"
+		IN4_16OUT = "ЧИШФЮ_АНЬОУЬОШЦД"
 
-		IN1_8OUT = "ДЖЮМБЙЕЕ"
-		IN2_8OUT = "ДЖЮМБЙЕЕ"
-		IN3_8OUT = "ЬЗЭЛЙЙДЕ"
+		IN1_8OUT = "_ВЧЬЩЮСН"
+		IN2_8OUT = "_ВЧЬЩЮСН"
+		IN3_8OUT = "__ВЭЙАЩХ"
+		IN4_8OUT = "ХИЩВКЗКА"
 
-		IN4 = []string{"ХОРОШО_БЫТЬ_ВАМИ", "КЬЕРКЕГОР_ПРОПАЛ"}
-		IN5 = []string{"ЧЕРНЫЙ_АББАТ_ПОЛ", "ХОРОШО_БЫТЬ_ВАМИ", "КЬЕРКЕГОР_ПРОПАЛ"}
+		IN5 = []string{"ХОРОШО_БЫТЬ_ВАМИ", "КЬЕРКЕГОР_ПРОПАЛ"}
+		IN6 = []string{"ЧЕРНЫЙ_АББАТ_ПОЛ", "ХОРОШО_БЫТЬ_ВАМИ", "КЬЕРКЕГОР_ПРОПАЛ"}
 
-		IN4_16OUT = "_ЭВТЮМШРЙШГЛДХЖН"
-		IN4_8OUT  = "ЮЙЬГООКЩ"
-		IN4_4OUT  = "ОЫРЙ"
+		IN5_16OUT = "ЩКЗЫЫЖЩСЧ_ПСЙЕУО"
+		IN5_8OUT  = "ФСБМБЕГА"
 
-		IN5_16OUT = "ШЯФЩЦНБЩЭФЭЬСХКК"
-		IN5_8OUT  = "ПМЦУОКЗЖ"
-		IN5_4OUT  = "АБОМ"
+		IN6_16OUT = "ЙЖЭБИЛЖЬВ_ЙЦГБУЖ"
+		IN6_8OUT  = "ТТГЮЖБЮЮ"
+		IN6_4OUT  = "ЛРЕ_"
 
-		IN6 = []string{
+		IN7 = []string{
 			"______А_________",
 			"________________",
 			"________________",
 			"________________",
 		}
-		IN7 = []string{
+		IN8 = []string{
 			"________________",
 			"________________",
 			"________________",
 			"________________",
 		}
-		IN8 = []string{
+		IN9 = []string{
 			"_____А__________",
 			"___________А____",
 			"_А______________",
 			"____________А___",
 		}
 
-		IN6_16OUT = "ЭХЕБФ_ИЖАЕАУХЖОК"
-		IN6_8OUT  = "СХОИЦМПЯ"
-		IN6_4OUT  = "ЫИЯЙ"
+		IN7_16OUT = "ОРСЗДЫЖШЯЭХЛФИЖР"
+		IN7_8OUT  = "УЛШАУЕЭЭ"
+		IN7_4OUT  = "_ЕЬГ"
 
-		IN7_16OUT = "ЭХЕОМВЙЗЖУЕШХЦЮК"
-		IN7_8OUT  = "ЙШПЦЭКГГ"
-		IN7_4OUT  = "МНЛТ"
+		IN8_16OUT = "РЗФВЛЫУЩ_ЯХМДЙЧР"
+		IN8_8OUT  = "ЭВИЭДИНЮ"
+		IN8_4OUT  = "ЧЩЫЯ"
 
-		IN8_16OUT = "ЭТЕЫМЮЛЙСУЮЗХТБЛ"
-		IN8_8OUT  = "ЙРСДЗЖ_У"
-		IN8_4OUT  = "БЙСР"
+		IN9_16OUT = "ЦШЮЬЗЩШТЯБХЦЛЖЮЮ"
+		IN9_8OUT  = "ЯТЦОКИУФ"
+		IN9_4OUT  = "УЙВЩ"
 
-		IN6_16_SUB_IN8_16_OUT = "_В_ЖЗБЭЭОСВЛ_УМЯ"
-		IN6_16_SUB_IN7_16_OUT = "___ТЗЭЯЯЩСЫЫ_ПР_"
-		IN7_16_SUB_IN8_16_OUT = "_В_У_ДЮЮФ_ЗР_ГЬЯ"
+		IN7_16_SUB_IN9_16_OUT = "ЧЧУЛЭАНЕ_Ы_ФИБИТ"
+		IN7_16_SUB_IN8_16_OUT = "ЮИЭДШ_ТЯЯЮ_ЯПЯО_"
+		IN8_16_SUB_IN9_16_OUT = "ЩОЦЖГАЫЖАЭ_ХШВЩТ"
 	)
 
 	tests := []struct {
@@ -84,14 +87,11 @@ func TestSponge_CBlock(t *testing.T) {
 		{"{ " + strings.Join(IN2, " ") + " } -> " + IN2_8OUT, IN2, 8, IN2_8OUT},
 		{"{ " + strings.Join(IN3, " ") + " } -> " + IN3_16OUT, IN3, 16, IN3_16OUT},
 		{"{ " + strings.Join(IN3, " ") + " } -> " + IN3_8OUT, IN3, 8, IN3_8OUT},
-
 		{"{ " + strings.Join(IN4, " ") + " } -> " + IN4_16OUT, IN4, 16, IN4_16OUT},
 		{"{ " + strings.Join(IN4, " ") + " } -> " + IN4_8OUT, IN4, 8, IN4_8OUT},
-		{"{ " + strings.Join(IN4, " ") + " } -> " + IN4_4OUT, IN4, 4, IN4_4OUT},
 
 		{"{ " + strings.Join(IN5, " ") + " } -> " + IN5_16OUT, IN5, 16, IN5_16OUT},
 		{"{ " + strings.Join(IN5, " ") + " } -> " + IN5_8OUT, IN5, 8, IN5_8OUT},
-		{"{ " + strings.Join(IN5, " ") + " } -> " + IN5_4OUT, IN5, 4, IN5_4OUT},
 
 		{"{ " + strings.Join(IN6, " ") + " } -> " + IN6_16OUT, IN6, 16, IN6_16OUT},
 		{"{ " + strings.Join(IN6, " ") + " } -> " + IN6_8OUT, IN6, 8, IN6_8OUT},
@@ -104,6 +104,10 @@ func TestSponge_CBlock(t *testing.T) {
 		{"{ " + strings.Join(IN8, " ") + " } -> " + IN8_16OUT, IN8, 16, IN8_16OUT},
 		{"{ " + strings.Join(IN8, " ") + " } -> " + IN8_8OUT, IN8, 8, IN8_8OUT},
 		{"{ " + strings.Join(IN8, " ") + " } -> " + IN8_4OUT, IN8, 4, IN8_4OUT},
+
+		{"{ " + strings.Join(IN9, " ") + " } -> " + IN9_16OUT, IN9, 16, IN9_16OUT},
+		{"{ " + strings.Join(IN9, " ") + " } -> " + IN9_8OUT, IN9, 8, IN9_8OUT},
+		{"{ " + strings.Join(IN9, " ") + " } -> " + IN9_4OUT, IN9, 4, IN9_4OUT},
 	}
 
 	subTests := []struct {
@@ -113,14 +117,14 @@ func TestSponge_CBlock(t *testing.T) {
 		size   int
 		output string
 	}{
-		{"IN6_16 - IN8_16", IN6, IN8, 16, IN6_16_SUB_IN8_16_OUT},
-		{"IN6_16 - IN7_16", IN6, IN7, 16, IN6_16_SUB_IN7_16_OUT},
+		{"IN7_16 - IN9_16", IN7, IN9, 16, IN7_16_SUB_IN9_16_OUT},
 		{"IN7_16 - IN8_16", IN7, IN8, 16, IN7_16_SUB_IN8_16_OUT},
+		{"IN8_16 - IN9_16", IN8, IN9, 16, IN8_16_SUB_IN9_16_OUT},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := sponge.CBlock(tt.input, tt.size)
+			got := sponge.CBlock.Run(tt.input, tt.size)
 
 			if tt.output != got {
 				t.Errorf("Failed CBlock(input=%q, size=%q), want %v but return %v", tt.input, tt.size, tt.output, got)
@@ -132,8 +136,8 @@ func TestSponge_CBlock(t *testing.T) {
 
 	for _, tt := range subTests {
 		t.Run(tt.name, func(t *testing.T) {
-			got1 := sponge.CBlock(tt.input1, tt.size)
-			got2 := sponge.CBlock(tt.input2, tt.size)
+			got1 := sponge.CBlock.Run(tt.input1, tt.size)
+			got2 := sponge.CBlock.Run(tt.input2, tt.size)
 			subGot := sponge.Alphabet.SubTxt(got1, got2)
 
 			if tt.output != subGot {
@@ -147,8 +151,8 @@ func TestSponge_CBlock(t *testing.T) {
 
 func TestSponge_MixCols_ShatterBlocks_ShiftRows(t *testing.T) {
 	var (
-		TelegraphAlphabet = []rune("АБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЫЬЭЮЯ_")
-		alphabet          = *alpha.NewAlphabet(TelegraphAlphabet)
+		alphabet = alpha.NewAlphabet(alpha.TelegraphAlphabet)
+		cBlock   = core.NewCBlock(*alphabet)
 
 		state0 = [5][5]string{
 			{"____", "____", "____", "____", "____"},
@@ -158,7 +162,7 @@ func TestSponge_MixCols_ShatterBlocks_ShiftRows(t *testing.T) {
 			{"____", "____", "____", "____", "____"},
 		}
 
-		sponge = hash.NewSponge(state0, alphabet)
+		sponge = hash.NewSponge(state0, *alphabet, *cBlock)
 
 		state11 = [5][5]string{
 			{"__М_", "__А_", "__В_", "__М_", "__Т_"},
@@ -300,53 +304,44 @@ func TestSponge_MixCols_ShatterBlocks_ShiftRows(t *testing.T) {
 
 func TestSponge_SpongeAbsorb(t *testing.T) {
 	var (
-		TelegraphAlphabet = []rune("АБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЫЬЭЮЯ_")
-		alphabet          = *alpha.NewAlphabet(TelegraphAlphabet)
-
-		state0 = [5][5]string{
-			{"____", "____", "____", "____", "____"},
-			{"____", "____", "____", "____", "____"},
-			{"____", "____", "____", "____", "____"},
-			{"____", "____", "____", "____", "____"},
-			{"____", "____", "____", "____", "____"},
-		}
-
-		sponge = hash.NewSponge(state0, alphabet)
+		alphabet = alpha.NewAlphabet(alpha.TelegraphAlphabet)
+		cBlock   = core.NewCBlock(*alphabet)
+		sponge   = hash.NewSponge(hash.SpongeStarterState, *alphabet, *cBlock)
 
 		IN1 = "_А__"
 		IN2 = "ВИЛЯ"
 		IN3 = "ОЗЛ_"
 
 		state1 = [5][5]string{
-			{"ЖИХЬ", "ВМНЛ", "ИЖЙГ", "ЖИХЬ", "ШЦЙГ"},
-			{"ИХЬЖ", "МНЛВ", "ЖЙГИ", "ИХЬЖ", "ГЧПЬ"},
-			{"ИХЬЖ", "МНЛВ", "ЖЙГИ", "ЬЗПГ", "ЦЙГШ"},
-			{"ИХЬЖ", "МНЛВ", "УЧПЛ", "ИХЬЖ", "ЦЙГШ"},
-			{"ИХЬЖ", "____", "ЖЙГИ", "ИХЬЖ", "ЦЙГШ"},
+			{"ИЖТЫ", "МВЯЖ", "ЖИЭФ", "ИЖТЫ", "ЦШМД"},
+			{"ЖТЫИ", "ВЯЖМ", "ИЭФЖ", "ЖТЫИ", "ЬЛЛГ"},
+			{"ЖТЫИ", "ВЯЖМ", "ИЭФЖ", "ГУУЬ", "ШМДЦ"},
+			{"ЖТЫИ", "ВЯЖМ", "ЛЬЬУ", "ЖТЫИ", "ШМДЦ"},
+			{"ЖТЫИ", "____", "ИЭФЖ", "ЖТЫИ", "ШМДЦ"},
 		}
 
 		state2 = [5][5]string{
-			{"ГНЙЬ", "ЗННУ", "ЕККС", "ЭКХЛ", "МСКЙ"},
-			{"РУ_И", "ННУЗ", "ЧШЮИ", "КХЛЭ", "СЭЕЫ"},
-			{"РУ_И", "ННУЗ", "ЧШЮИ", "МРХЩ", "СКЙМ"},
-			{"РУ_И", "А_ЗД", "УРНА", "ЧГЧ_", "СКЙМ"},
-			{"РУ_И", "ЖДЮЗ", "ККСЕ", "КХЛЭ", "СКЙМ"},
+			{"НВХЙ", "ЮЖНБ", "ЯГЦЯ", "ТХШЭ", "НЭЧ_"},
+			{"ПЦВР", "ЖНБЮ", "ЖХЕЛ", "ХШЭТ", "СЬЗЮ"},
+			{"ПЦВР", "ЖНБЮ", "ЖХЕЛ", "ЯАЭР", "ЭЧ_Н"},
+			{"ПЦВР", "ГОЫР", "_БЮ_", "ШЧГ_", "ЭЧ_Н"},
+			{"ПЦВР", "ИОКК", "ГЦЯЯ", "ХШЭТ", "ЭЧ_Н"},
 		}
 
 		state3 = [5][5]string{
-			{"ПНЯС", "ДОЫН", "МЭРУ", "ЖЦСЯ", "ЖДЬЭ"},
-			{"КР_М", "ОЫНД", "ЕЦПЗ", "ШОДБ", "ДБЦН"},
-			{"МЮЕЧ", "БМББ", "ЦЛЮЙ", "УПЛЧ", "КТОЧ"},
-			{"ОКЛВ", "ЗСЧД", "Н_АВ", "ТЙОЯ", "ИЕИМ"},
-			{"РЗСЮ", "ЛЮНЧ", "ЭРУМ", "ФДШЬ", "ЖШВБ"},
+			{"МЩВЫ", "ЮАЮЩ", "ЛЖФП", "АКФД", "КЯЛЖ"},
+			{"ЩЬУУ", "АЮЩЮ", "В_ОМ", "ИАМО", "ТЭГЧ"},
+			{"ЧЗЬБ", "ЮЯТР", "БФ_С", "ЕФЗУ", "ШПЯФ"},
+			{"ХУГП", "ВЯВК", "БЮАЦ", "ГАЭФ", "ЫГЦЖ"},
+			{"У_ЛЮ", "ЮВЩЕ", "ЖФПЛ", "МИЭТ", "ЭЧОШ"},
 		}
 
 		state4 = [5][5]string{
-			{"ЬВИГ", "НИРУ", "УЫШД", "ЗССО", "ЫПЖЧ"},
-			{"ЗХПР", "ЩХБ_", "НФЧФ", "ЖКХТ", "РШЧХ"},
-			{"ЯВДЧ", "ЮНСЧ", "ЫЦЫЖ", "ЕДОТ", "ЙЧЙЮ"},
-			{"ОЫАУ", "_ЭБП", "НОЫЙ", "КВЧЬ", "ФЧЫБ"},
-			{"ЗЮУД", "ЭРЯУ", "ЫИДГ", "ЕУЯБ", "ЖМДР"},
+			{"ЬЯЛП", "БГГЙ", "ДРГЭ", "РЬЦЬ", "ЙИЯК"},
+			{"КЗСЬ", "ВШЫЖ", "ЙШХЮ", "Э_ЬЖ", "ФБИЛ"},
+			{"_ФЩС", "ЙМВТ", "СЧХЕ", "ЯГЫТ", "БЧЦЛ"},
+			{"АГЕХ", "ЖДС_", "ГХОЛ", "ЩЛДГ", "КЦЦГ"},
+			{"ЮДХЗ", "ЩШЮЮ", "РГЭД", "Ц__И", "ЗУТН"},
 		}
 
 		tests = []struct {
@@ -377,7 +372,8 @@ func TestSponge_SpongeAbsorb(t *testing.T) {
 func TestSponge_SpongeSqueeze(t *testing.T) {
 	var (
 		TelegraphAlphabet = []rune("АБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЫЬЭЮЯ_")
-		alphabet          = *alpha.NewAlphabet(TelegraphAlphabet)
+		alphabet          = alpha.NewAlphabet(TelegraphAlphabet)
+		cBlock            = core.NewCBlock(*alphabet)
 
 		stateX = [5][5]string{
 			{"БЫ_Щ", "ЙЖ_Б", "ЮФ_Е", "БЫ_Щ", "ЮД_Е"},
@@ -387,11 +383,11 @@ func TestSponge_SpongeSqueeze(t *testing.T) {
 			{"Ы_ЩБ", "____", "Ф_ЕЮ", "Ы_ЩБ", "Д_ЕЮ"},
 		}
 
-		sponge = hash.NewSponge(stateX, alphabet)
+		sponge = hash.NewSponge(stateX, *alphabet, *cBlock)
 
-		OUT1 = "ШНОТ"
-		OUT2 = "НБНЮ"
-		OUT3 = "ИФСУ"
+		OUT1 = "ПЮФД"
+		OUT2 = "_ЯГЧ"
+		OUT3 = "РКХ_"
 
 		tests = []struct {
 			name   string
@@ -418,25 +414,26 @@ func TestSponge_SpongeSqueeze(t *testing.T) {
 
 func TestSponge_Hash(t *testing.T) {
 	var (
-		TelegraphAlphabet = []rune("АБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЫЬЭЮЯ_")
-		alphabet          = *alpha.NewAlphabet(TelegraphAlphabet)
+		alphabet = alpha.NewAlphabet(alpha.TelegraphAlphabet)
+		cBlock   = core.NewCBlock(*alphabet)
+		hasher   = hash.NewHasher(*alphabet, *cBlock)
 
 		IN1 = "КАТЕГОРИЧЕСКИЙ_ИМПЕРАТИВ"
 		IN2 = "________________________________________________________________"
 		IN3 = "______________________А_________________________________________"
 		IN4 = "________А_______________________________________________________"
 		IN5 = "ПЕТЯ_ПИЛ_ПИВО_В_КАЛЬЯННОЙ_И_КУРИЛ_БАМБУК_ЧЕРЕЗ_АНАНАС_ТЧК_НАСТЯ_ПИЛА_ВОДУ_И_НЕ_ПОШЛА_В_КАЛЬЯННУЮ_ЗПТ_ЧТОБЫ_ВЫСПАТЬСЯ"
-		//IN6 = "ЗОЛОТЫЕ_ВРЕМЕНА_ПРОШЛИ_ТЧК_НАСТАЛА_ПОРА_ГРУЗИТЬ_АПЕЛЬСИНЫ_БОЧКАМИ_И_НЕ_ОГЛЯДЫВАТЬСЯ_НАЗАД_ТЧК_КОГДАТО_СНОВА_МЫ_БУДЕМ_ТАМ_ГДЕ_НАС_ЖДУТ_ТЧК"
+		IN6 = "ЗОЛОТЫЕ_ВРЕМЕНА_ПРОШЛИ_ТЧК_НАСТАЛА_ПОРА_ГРУЗИТЬ_АПЕЛЬСИНЫ_БОЧКАМИ_И_НЕ_ОГЛЯДЫВАТЬСЯ_НАЗАД_ТЧК_КОГДАТО_СНОВА_МЫ_БУДЕМ_ТАМ_ГДЕ_НАС_ЖДУТ_ТЧК"
 
-		OUT1 = "Й_НСПЮБЮЛЯОЯЛЩГЩВЧЫЫШЩГДЖФОНЕЙЮЫДПЬФШШАНЦДДЮ_ШЯДЕОНЬДЦА_ГЬЭДЩЙПИ"
-		OUT2 = "_КЫЫШГЛВЯЖМНАЫ_ТУТЬИВЬЧПЖФЕПЕЬРХУЬСАЖЗЦТОБЯСЫУЫЬФЮШБШНЮДУЮЗЩКЙАХ"
-		OUT3 = "ГЗМВЭЮГШКЖЯЛБИЧМРЩОЭЯМСМХУВЦШЮПЯЗДЩСЖЬТВЕЩНРЭУШЛВЗРЬМИИ_ДХИВЧТДВ"
-		OUT4 = "_КЫЫШГЛВЯЖМНАЫ_ТУТЬИВЬЧПЖФЕПЕЬРХУЬСАЖЗЦТОБЯСЫУЫЬФЮШБШНЮДУЮЗЩКЙАХ"
-		OUT5 = "БЕЭНТЛБСОПМЫЬЛЧБХЭЗЩИЗЛЭЦТЕЗЖЩЖРМТЯЫЮКЫРЫХОЕЮДКРФИИЕМДТЮ_ОНМЙШЦЭ"
-		//OUT6 = "ХБХШЯБЕГККТСЦМПТРЖИЩМ_АКЗВЖАЧЕ_ДАПКФИЖЕЧДСЖБРЦЗПШЖЩСОЙЖОЯГЮГДОЗП"
+		OUT1 = "ЦЮЖДФНДЗДЛЖ_ГМЕУЩЭСЕЖЧЗНРБУЕВ_МЮКЖЕУНАЖЩБЦЩШФПЛФИЗОЯГА_ПЗФПЯЧРУЭ"
+		OUT2 = "ЙЖТЩЩВЫЛЫРЭТЛДТЮУЬЙКПТЯЮАХУЭОЩЫТХНЩЗЖБПЛЩЛСРЖЖЙФЯМАРЗУОЫЗФ_Й_ОЖГ"
+		OUT3 = "ЬЩТНЧЭГСЖЫОЙЯМВКБЮМЧЫЭГТАЙЧМЩИМЛЦЦЦКОНЗКТЩЖРЧШКЬЖЧ_Ю_ЧШХЦБЙОЛТВО"
+		OUT4 = "ЫЙЫДЬЩЗМЦМБУЬГЯЛЦЩЯЙВСИБЛЦН_ХЮАЯПВЛНЧЛЙРХЙ_ЕТЙМВАЭ_ВЙЗП_НЗЛБФЧХО"
+		OUT5 = "М_ЗКЩМУЬДЩШЧНДИФЙЕШГЯЛПВВШЧЙЕЮ_ШЩЩКЫАУЦЧЭЕМЕОЮЧ_ОВЖЗБДЙЛДЫМ_БМЛВ"
+		OUT6 = "ЮЫКСЛНФХОЯЗФЦИБКЮЛЖХААКЙИИВЩГЯГДГСАЙФ_ЗНЕНИИРДУИЕЦЯЦТВЗНМФПБМА_Э"
 
-		SUB_OUT1 = "ЬВНЧЬЕЗЙУ_НБЯСЗЕВШМЛГОЕВРАВШМЮАЦЛЦЧО_ЛГПИЗРАЮ_БПСХЗЕЛДФДОЗЯЦТЦЬТ"
-		SUB_OUT2 = "________________________________________________________________"
+		SubOut1 = "НМ_ЛБЕЦЩУХНИМЧПТСЮЭТФХЫК_ЛЬПФРНЖЯЦВЭЧУЗАЖСК_ОНЯШЧФАТЗЬХДРТХЫУЬГФ"
+		SubOut2 = "ОЭЧФЮИТЯГГЫЯПАУСЭБКАМАХЬФЯЕЭШЬЩУЕКНЩОХЕЫГБСКУЭЭСЮПАНЮЛЯЫЩМУЗКЦРФ"
 
 		tests = []struct {
 			name   string
@@ -448,7 +445,7 @@ func TestSponge_Hash(t *testing.T) {
 			{IN3 + "->" + OUT3, IN3, OUT3},
 			{IN4 + "->" + OUT4, IN4, OUT4},
 			{IN5 + "->" + OUT5, IN5, OUT5},
-			//{IN6 + "->" + OUT6, IN6, OUT6},
+			{IN6 + "->" + OUT6, IN6, OUT6},
 		}
 
 		subTests = []struct {
@@ -457,14 +454,14 @@ func TestSponge_Hash(t *testing.T) {
 			input2 string
 			output string
 		}{
-			{IN2 + "-" + IN3 + "->" + OUT1, IN2, IN3, SUB_OUT1},
-			{IN2 + "-" + IN4 + "->" + OUT1, IN2, IN4, SUB_OUT2},
+			{IN2 + "-" + IN3 + "->" + OUT1, IN2, IN3, SubOut1},
+			{IN2 + "-" + IN4 + "->" + OUT2, IN2, IN4, SubOut2},
 		}
 	)
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := hash.SpongeHash(tt.input, alphabet)
+			got := hasher.Hash(tt.input)
 
 			if tt.output != got {
 				t.Errorf("Failed Sponge Hash, want %v but return %v", tt.output, got)
@@ -476,8 +473,8 @@ func TestSponge_Hash(t *testing.T) {
 
 	for _, tt := range subTests {
 		t.Run(tt.name, func(t *testing.T) {
-			got1 := hash.SpongeHash(tt.input1, alphabet)
-			got2 := hash.SpongeHash(tt.input2, alphabet)
+			got1 := hasher.Hash(tt.input1)
+			got2 := hasher.Hash(tt.input2)
 			subGot := alphabet.SubTxt(got1, got2)
 
 			if tt.output != subGot {

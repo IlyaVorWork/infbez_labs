@@ -5,6 +5,8 @@ import (
 	"strings"
 )
 
+var TelegraphAlphabet = []rune("АБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЫЬЭЮЯ_")
+
 type Alphabet struct {
 	AlphabetArr    []rune
 	AlphabetLength int
@@ -183,6 +185,6 @@ func (a *Alphabet) BinToBlock(bin []int) string {
 	return a.NumToBlock(temp)
 }
 
-func (a *Alphabet) PushReg(bin []int, bool_in int) []int {
-	return append(bin[1:], bool_in)
+func (a *Alphabet) PushReg(bin []int, boolIn int) []int {
+	return append(bin[1:], boolIn)
 }

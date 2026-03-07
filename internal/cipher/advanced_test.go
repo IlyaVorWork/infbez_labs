@@ -2,6 +2,7 @@ package cipher_test
 
 import (
 	"fmt"
+	"infbez_labs/internal/alphabet"
 	"infbez_labs/internal/cipher"
 	"math/rand"
 	"testing"
@@ -137,15 +138,15 @@ func Test_STrithemius_Input(t *testing.T) {
 	)
 	seed := time.Now().UnixNano()
 	rnd := rand.New(rand.NewSource(seed))
-	trithemius := cipher.NewTrithemius(TelegraphAlphabet)
+	trithemius := cipher.NewTrithemius(Alphabet)
 
 	inputs := make([]string, 0, numInputs)
 	keys := make([]string, 0, numKeys)
 	for i := 0; i < numInputs; i++ {
-		inputs = append(inputs, randomBlock(TelegraphAlphabet, blockLen, rnd))
+		inputs = append(inputs, randomBlock(alphabet.TelegraphAlphabet, blockLen, rnd))
 	}
 	for i := 0; i < numKeys; i++ {
-		keys = append(keys, randomBlock(TelegraphAlphabet, keyLen, rnd))
+		keys = append(keys, randomBlock(alphabet.TelegraphAlphabet, keyLen, rnd))
 	}
 
 	fmt.Println(inputs)
@@ -164,7 +165,7 @@ func Test_STrithemius_Input(t *testing.T) {
 
 		for _, p := range inputs {
 			for _, k := range keys {
-				pPrime := makeSmallChangeOnBlock(TelegraphAlphabet, p, rnd)
+				pPrime := makeSmallChangeOnBlock(alphabet.TelegraphAlphabet, p, rnd)
 				c1 := trithemius.EncodeSTrithemius(p, k)
 				c2 := trithemius.EncodeSTrithemius(pPrime, k)
 				diff := diffPositions(c1, c2)
@@ -210,7 +211,7 @@ func Test_STrithemius_Input(t *testing.T) {
 			for i := 0; i < n; i++ {
 				r := list[i]
 				t.Logf("P=%q, P'=%q, K=%q => C1=%q, C2=%q, diff=%d",
-					r.input, makeSmallChangeOnBlock(TelegraphAlphabet, r.input, rnd), r.key, r.c1, r.c2, r.diff)
+					r.input, makeSmallChangeOnBlock(alphabet.TelegraphAlphabet, r.input, rnd), r.key, r.c1, r.c2, r.diff)
 			}
 		}
 		printExamples("0 символов поменялось", noneChangeList)
@@ -360,15 +361,15 @@ func Test_STrithemius_Key(t *testing.T) {
 	)
 	seed := time.Now().UnixNano()
 	rnd := rand.New(rand.NewSource(seed))
-	alphabet := cipher.NewTrithemius(TelegraphAlphabet)
+	trithemius := cipher.NewTrithemius(Alphabet)
 
 	inputs := make([]string, 0, numInputs)
 	keys := make([]string, 0, numKeys)
 	for i := 0; i < numInputs; i++ {
-		inputs = append(inputs, randomBlock(TelegraphAlphabet, blockLen, rnd))
+		inputs = append(inputs, randomBlock(alphabet.TelegraphAlphabet, blockLen, rnd))
 	}
 	for i := 0; i < numKeys; i++ {
-		keys = append(keys, randomBlock(TelegraphAlphabet, keyLen, rnd))
+		keys = append(keys, randomBlock(alphabet.TelegraphAlphabet, keyLen, rnd))
 	}
 
 	fmt.Println(inputs)
@@ -387,9 +388,9 @@ func Test_STrithemius_Key(t *testing.T) {
 
 		for _, k := range keys {
 			for _, p := range inputs {
-				kPrime := makeSmallChangeOnBlock(TelegraphAlphabet, k, rnd)
-				c1 := alphabet.EncodeSTrithemius(p, k)
-				c2 := alphabet.EncodeSTrithemius(p, kPrime)
+				kPrime := makeSmallChangeOnBlock(alphabet.TelegraphAlphabet, k, rnd)
+				c1 := trithemius.EncodeSTrithemius(p, k)
+				c2 := trithemius.EncodeSTrithemius(p, kPrime)
 				diff := diffPositions(c1, c2)
 
 				res := Result{p, k, c1, c2, diff}
@@ -433,7 +434,7 @@ func Test_STrithemius_Key(t *testing.T) {
 			for i := 0; i < n; i++ {
 				r := list[i]
 				t.Logf("P=%q, K=%q, K'=%q => C1=%q, C2=%q, diff=%d",
-					r.input, r.key, makeSmallChangeOnBlock(TelegraphAlphabet, r.key, rnd), r.c1, r.c2, r.diff)
+					r.input, r.key, makeSmallChangeOnBlock(alphabet.TelegraphAlphabet, r.key, rnd), r.c1, r.c2, r.diff)
 			}
 		}
 		printExamples("0 символов поменялось", noneChangeList)
@@ -460,8 +461,8 @@ func Test_STrithemius_Key(t *testing.T) {
 				shift := 1 + rnd.Intn(blockLen-1)
 
 				kPrime := rotateRightRunes(k, shift)
-				c1 := alphabet.EncodeSTrithemius(p, k)
-				c2 := alphabet.EncodeSTrithemius(p, kPrime)
+				c1 := trithemius.EncodeSTrithemius(p, k)
+				c2 := trithemius.EncodeSTrithemius(p, kPrime)
 				same := outputsHaveSameMultiset(c1, c2)
 
 				res := RResult{p, shift, k, c1, c2, same}
@@ -521,15 +522,15 @@ func Test_STrithemius_Key(t *testing.T) {
 				}
 				k1 := keys[i]
 				k2 := keys[j]
-				k3 := alphabet.Alphabet.AddTxt(k1, k2)
+				k3 := trithemius.Alphabet.AddTxt(k1, k2)
 				if k3 == k1 || k3 == k2 {
 					continue
 				}
 				for _, p := range inputs {
-					c1 := alphabet.EncodeSTrithemius(p, k1)
-					c2 := alphabet.EncodeSTrithemius(p, k2)
-					c3 := alphabet.EncodeSTrithemius(p, k3)
-					c1plus2 := alphabet.Alphabet.AddTxt(c1, c2)
+					c1 := trithemius.EncodeSTrithemius(p, k1)
+					c2 := trithemius.EncodeSTrithemius(p, k2)
+					c3 := trithemius.EncodeSTrithemius(p, k3)
+					c1plus2 := trithemius.Alphabet.AddTxt(c1, c2)
 					diff := diffPositions(c1plus2, c3)
 
 					res := LResult{p, k1, k2, k3, c1, c2, c3, c1plus2, diff}
@@ -582,15 +583,15 @@ func Test_MergeBlock_Input(t *testing.T) {
 	)
 	seed := time.Now().UnixNano()
 	rnd := rand.New(rand.NewSource(seed))
-	alphabet := cipher.NewTrithemius(TelegraphAlphabet)
+	trithemius := cipher.NewTrithemius(Alphabet)
 
 	inputs := make([]string, 0, numInputs)
 	keys := make([]string, 0, numKeys)
 	for i := 0; i < numInputs; i++ {
-		inputs = append(inputs, randomBlock(TelegraphAlphabet, blockLen, rnd))
+		inputs = append(inputs, randomBlock(alphabet.TelegraphAlphabet, blockLen, rnd))
 	}
 	for i := 0; i < numKeys; i++ {
-		keys = append(keys, randomBlock(TelegraphAlphabet, keyLen, rnd))
+		keys = append(keys, randomBlock(alphabet.TelegraphAlphabet, keyLen, rnd))
 	}
 
 	fmt.Println(inputs)
@@ -609,9 +610,9 @@ func Test_MergeBlock_Input(t *testing.T) {
 
 		for _, p := range inputs {
 			for _, k := range keys {
-				pPrime := makeSmallChangeOnBlock(TelegraphAlphabet, p, rnd)
-				c1 := alphabet.EncodeMergeBlock(p, k)
-				c2 := alphabet.EncodeMergeBlock(pPrime, k)
+				pPrime := makeSmallChangeOnBlock(alphabet.TelegraphAlphabet, p, rnd)
+				c1 := trithemius.EncodeMergeBlock(p, k)
+				c2 := trithemius.EncodeMergeBlock(pPrime, k)
 				diff := diffPositions(c1, c2)
 
 				res := Result{p, k, c1, c2, diff}
@@ -655,7 +656,7 @@ func Test_MergeBlock_Input(t *testing.T) {
 			for i := 0; i < n; i++ {
 				r := list[i]
 				t.Logf("P=%q, P'=%q, K=%q => C1=%q, C2=%q, diff=%d",
-					r.input, makeSmallChangeOnBlock(TelegraphAlphabet, r.input, rnd), r.key, r.c1, r.c2, r.diff)
+					r.input, makeSmallChangeOnBlock(alphabet.TelegraphAlphabet, r.input, rnd), r.key, r.c1, r.c2, r.diff)
 			}
 		}
 		printExamples("0 символов поменялось", noneChangeList)
@@ -682,8 +683,8 @@ func Test_MergeBlock_Input(t *testing.T) {
 				shift := 1 + rnd.Intn(blockLen-1)
 
 				pPrime := rotateRightRunes(p, shift)
-				c1 := alphabet.EncodeMergeBlock(p, k)
-				c2 := alphabet.EncodeMergeBlock(pPrime, k)
+				c1 := trithemius.EncodeMergeBlock(p, k)
+				c2 := trithemius.EncodeMergeBlock(pPrime, k)
 				same := outputsHaveSameMultiset(c1, c2)
 
 				res := RResult{p, shift, k, c1, c2, same}
@@ -743,15 +744,15 @@ func Test_MergeBlock_Input(t *testing.T) {
 				}
 				p1 := inputs[i]
 				p2 := inputs[j]
-				p3 := alphabet.Alphabet.AddTxt(p1, p2)
+				p3 := trithemius.Alphabet.AddTxt(p1, p2)
 				if p3 == p1 || p3 == p2 {
 					continue
 				}
 				for _, k := range keys {
-					c1 := alphabet.EncodeMergeBlock(p1, k)
-					c2 := alphabet.EncodeMergeBlock(p2, k)
-					c3 := alphabet.EncodeMergeBlock(p3, k)
-					c1plus2 := alphabet.Alphabet.AddTxt(c1, c2)
+					c1 := trithemius.EncodeMergeBlock(p1, k)
+					c2 := trithemius.EncodeMergeBlock(p2, k)
+					c3 := trithemius.EncodeMergeBlock(p3, k)
+					c1plus2 := trithemius.Alphabet.AddTxt(c1, c2)
 					diff := diffPositions(c1plus2, c3)
 
 					res := LResult{p1, p2, p3, k, c1, c2, c3, c1plus2, diff}
@@ -805,15 +806,15 @@ func Test_MergeBlock_Key(t *testing.T) {
 	)
 	seed := time.Now().UnixNano()
 	rnd := rand.New(rand.NewSource(seed))
-	alphabet := cipher.NewTrithemius(TelegraphAlphabet)
+	trithemius := cipher.NewTrithemius(Alphabet)
 
 	inputs := make([]string, 0, numInputs)
 	keys := make([]string, 0, numKeys)
 	for i := 0; i < numInputs; i++ {
-		inputs = append(inputs, randomBlock(TelegraphAlphabet, blockLen, rnd))
+		inputs = append(inputs, randomBlock(alphabet.TelegraphAlphabet, blockLen, rnd))
 	}
 	for i := 0; i < numKeys; i++ {
-		keys = append(keys, randomBlock(TelegraphAlphabet, keyLen, rnd))
+		keys = append(keys, randomBlock(alphabet.TelegraphAlphabet, keyLen, rnd))
 	}
 
 	fmt.Println(inputs)
@@ -832,9 +833,9 @@ func Test_MergeBlock_Key(t *testing.T) {
 
 		for _, k := range keys {
 			for _, p := range inputs {
-				kPrime := makeSmallChangeOnBlock(TelegraphAlphabet, k, rnd)
-				c1 := alphabet.EncodeMergeBlock(p, k)
-				c2 := alphabet.EncodeMergeBlock(p, kPrime)
+				kPrime := makeSmallChangeOnBlock(alphabet.TelegraphAlphabet, k, rnd)
+				c1 := trithemius.EncodeMergeBlock(p, k)
+				c2 := trithemius.EncodeMergeBlock(p, kPrime)
 				diff := diffPositions(c1, c2)
 
 				res := Result{p, k, c1, c2, diff}
@@ -878,7 +879,7 @@ func Test_MergeBlock_Key(t *testing.T) {
 			for i := 0; i < n; i++ {
 				r := list[i]
 				t.Logf("P=%q, K=%q, K'=%q => C1=%q, C2=%q, diff=%d",
-					r.input, r.key, makeSmallChangeOnBlock(TelegraphAlphabet, r.key, rnd), r.c1, r.c2, r.diff)
+					r.input, r.key, makeSmallChangeOnBlock(alphabet.TelegraphAlphabet, r.key, rnd), r.c1, r.c2, r.diff)
 			}
 		}
 		printExamples("0 символов поменялось", noneChangeList)
@@ -905,8 +906,8 @@ func Test_MergeBlock_Key(t *testing.T) {
 				shift := 1 + rnd.Intn(blockLen-1)
 
 				kPrime := rotateRightRunes(k, shift)
-				c1 := alphabet.EncodeMergeBlock(p, k)
-				c2 := alphabet.EncodeMergeBlock(p, kPrime)
+				c1 := trithemius.EncodeMergeBlock(p, k)
+				c2 := trithemius.EncodeMergeBlock(p, kPrime)
 				same := outputsHaveSameMultiset(c1, c2)
 
 				res := RResult{p, shift, k, c1, c2, same}
@@ -966,15 +967,15 @@ func Test_MergeBlock_Key(t *testing.T) {
 				}
 				k1 := keys[i]
 				k2 := keys[j]
-				k3 := alphabet.Alphabet.AddTxt(k1, k2)
+				k3 := trithemius.Alphabet.AddTxt(k1, k2)
 				if k3 == k1 || k3 == k2 {
 					continue
 				}
 				for _, p := range inputs {
-					c1 := alphabet.EncodeMergeBlock(p, k1)
-					c2 := alphabet.EncodeMergeBlock(p, k2)
-					c3 := alphabet.EncodeMergeBlock(p, k3)
-					c1plus2 := alphabet.Alphabet.AddTxt(c1, c2)
+					c1 := trithemius.EncodeMergeBlock(p, k1)
+					c2 := trithemius.EncodeMergeBlock(p, k2)
+					c3 := trithemius.EncodeMergeBlock(p, k3)
+					c1plus2 := trithemius.Alphabet.AddTxt(c1, c2)
 					diff := diffPositions(c1plus2, c3)
 
 					res := LResult{p, k1, k2, k3, c1, c2, c3, c1plus2, diff}
@@ -1027,15 +1028,15 @@ func Test_STrithemiusM_Input(t *testing.T) {
 	)
 	seed := time.Now().UnixNano()
 	rnd := rand.New(rand.NewSource(seed))
-	alphabet := cipher.NewTrithemius(TelegraphAlphabet)
+	trithemius := cipher.NewTrithemius(Alphabet)
 
 	inputs := make([]string, 0, numInputs)
 	keys := make([]string, 0, numKeys)
 	for i := 0; i < numInputs; i++ {
-		inputs = append(inputs, randomBlock(TelegraphAlphabet, blockLen, rnd))
+		inputs = append(inputs, randomBlock(alphabet.TelegraphAlphabet, blockLen, rnd))
 	}
 	for i := 0; i < numKeys; i++ {
-		keys = append(keys, randomBlock(TelegraphAlphabet, keyLen, rnd))
+		keys = append(keys, randomBlock(alphabet.TelegraphAlphabet, keyLen, rnd))
 	}
 
 	fmt.Println(inputs)
@@ -1054,9 +1055,9 @@ func Test_STrithemiusM_Input(t *testing.T) {
 
 		for _, p := range inputs {
 			for _, k := range keys {
-				pPrime := makeSmallChangeOnBlock(TelegraphAlphabet, p, rnd)
-				c1 := alphabet.EncodeSTrithemiusM(p, k)
-				c2 := alphabet.EncodeSTrithemiusM(pPrime, k)
+				pPrime := makeSmallChangeOnBlock(alphabet.TelegraphAlphabet, p, rnd)
+				c1 := trithemius.EncodeSTrithemiusM(p, k)
+				c2 := trithemius.EncodeSTrithemiusM(pPrime, k)
 				diff := diffPositions(c1, c2)
 
 				res := Result{p, k, c1, c2, diff}
@@ -1100,7 +1101,7 @@ func Test_STrithemiusM_Input(t *testing.T) {
 			for i := 0; i < n; i++ {
 				r := list[i]
 				t.Logf("P=%q, P'=%q, K=%q => C1=%q, C2=%q, diff=%d",
-					r.input, makeSmallChangeOnBlock(TelegraphAlphabet, r.input, rnd), r.key, r.c1, r.c2, r.diff)
+					r.input, makeSmallChangeOnBlock(alphabet.TelegraphAlphabet, r.input, rnd), r.key, r.c1, r.c2, r.diff)
 			}
 		}
 		printExamples("0 символов поменялось", noneChangeList)
@@ -1127,8 +1128,8 @@ func Test_STrithemiusM_Input(t *testing.T) {
 				shift := 1 + rnd.Intn(blockLen-1)
 
 				pPrime := rotateRightRunes(p, shift)
-				c1 := alphabet.EncodeSTrithemiusM(p, k)
-				c2 := alphabet.EncodeSTrithemiusM(pPrime, k)
+				c1 := trithemius.EncodeSTrithemiusM(p, k)
+				c2 := trithemius.EncodeSTrithemiusM(pPrime, k)
 				same := outputsHaveSameMultiset(c1, c2)
 
 				res := RResult{p, shift, k, c1, c2, same}
@@ -1188,15 +1189,15 @@ func Test_STrithemiusM_Input(t *testing.T) {
 				}
 				p1 := inputs[i]
 				p2 := inputs[j]
-				p3 := alphabet.Alphabet.AddTxt(p1, p2)
+				p3 := trithemius.Alphabet.AddTxt(p1, p2)
 				if p3 == p1 || p3 == p2 {
 					continue
 				}
 				for _, k := range keys {
-					c1 := alphabet.EncodeSTrithemiusM(p1, k)
-					c2 := alphabet.EncodeSTrithemiusM(p2, k)
-					c3 := alphabet.EncodeSTrithemiusM(p3, k)
-					c1plus2 := alphabet.Alphabet.AddTxt(c1, c2)
+					c1 := trithemius.EncodeSTrithemiusM(p1, k)
+					c2 := trithemius.EncodeSTrithemiusM(p2, k)
+					c3 := trithemius.EncodeSTrithemiusM(p3, k)
+					c1plus2 := trithemius.Alphabet.AddTxt(c1, c2)
 					diff := diffPositions(c1plus2, c3)
 
 					res := LResult{p1, p2, p3, k, c1, c2, c3, c1plus2, diff}
@@ -1250,15 +1251,15 @@ func Test_STrithemiusM_Key(t *testing.T) {
 	)
 	seed := time.Now().UnixNano()
 	rnd := rand.New(rand.NewSource(seed))
-	alphabet := cipher.NewTrithemius(TelegraphAlphabet)
+	trithemius := cipher.NewTrithemius(Alphabet)
 
 	inputs := make([]string, 0, numInputs)
 	keys := make([]string, 0, numKeys)
 	for i := 0; i < numInputs; i++ {
-		inputs = append(inputs, randomBlock(TelegraphAlphabet, blockLen, rnd))
+		inputs = append(inputs, randomBlock(alphabet.TelegraphAlphabet, blockLen, rnd))
 	}
 	for i := 0; i < numKeys; i++ {
-		keys = append(keys, randomBlock(TelegraphAlphabet, keyLen, rnd))
+		keys = append(keys, randomBlock(alphabet.TelegraphAlphabet, keyLen, rnd))
 	}
 
 	fmt.Println(inputs)
@@ -1277,9 +1278,9 @@ func Test_STrithemiusM_Key(t *testing.T) {
 
 		for _, k := range keys {
 			for _, p := range inputs {
-				kPrime := makeSmallChangeOnBlock(TelegraphAlphabet, k, rnd)
-				c1 := alphabet.EncodeSTrithemiusM(p, k)
-				c2 := alphabet.EncodeSTrithemiusM(p, kPrime)
+				kPrime := makeSmallChangeOnBlock(alphabet.TelegraphAlphabet, k, rnd)
+				c1 := trithemius.EncodeSTrithemiusM(p, k)
+				c2 := trithemius.EncodeSTrithemiusM(p, kPrime)
 				diff := diffPositions(c1, c2)
 
 				res := Result{p, k, c1, c2, diff}
@@ -1323,7 +1324,7 @@ func Test_STrithemiusM_Key(t *testing.T) {
 			for i := 0; i < n; i++ {
 				r := list[i]
 				t.Logf("P=%q, K=%q, K'=%q => C1=%q, C2=%q, diff=%d",
-					r.input, r.key, makeSmallChangeOnBlock(TelegraphAlphabet, r.key, rnd), r.c1, r.c2, r.diff)
+					r.input, r.key, makeSmallChangeOnBlock(alphabet.TelegraphAlphabet, r.key, rnd), r.c1, r.c2, r.diff)
 			}
 		}
 		printExamples("0 символов поменялось", noneChangeList)
@@ -1350,8 +1351,8 @@ func Test_STrithemiusM_Key(t *testing.T) {
 				shift := 1 + rnd.Intn(blockLen-1)
 
 				kPrime := rotateRightRunes(k, shift)
-				c1 := alphabet.EncodeSTrithemiusM(p, k)
-				c2 := alphabet.EncodeSTrithemiusM(p, kPrime)
+				c1 := trithemius.EncodeSTrithemiusM(p, k)
+				c2 := trithemius.EncodeSTrithemiusM(p, kPrime)
 				same := outputsHaveSameMultiset(c1, c2)
 
 				res := RResult{p, shift, k, c1, c2, same}
@@ -1411,15 +1412,15 @@ func Test_STrithemiusM_Key(t *testing.T) {
 				}
 				k1 := keys[i]
 				k2 := keys[j]
-				k3 := alphabet.Alphabet.AddTxt(k1, k2)
+				k3 := trithemius.Alphabet.AddTxt(k1, k2)
 				if k3 == k1 || k3 == k2 {
 					continue
 				}
 				for _, p := range inputs {
-					c1 := alphabet.EncodeSTrithemiusM(p, k1)
-					c2 := alphabet.EncodeSTrithemiusM(p, k2)
-					c3 := alphabet.EncodeSTrithemiusM(p, k3)
-					c1plus2 := alphabet.Alphabet.AddTxt(c1, c2)
+					c1 := trithemius.EncodeSTrithemiusM(p, k1)
+					c2 := trithemius.EncodeSTrithemiusM(p, k2)
+					c3 := trithemius.EncodeSTrithemiusM(p, k3)
+					c1plus2 := trithemius.Alphabet.AddTxt(c1, c2)
 					diff := diffPositions(c1plus2, c3)
 
 					res := LResult{p, k1, k2, k3, c1, c2, c3, c1plus2, diff}

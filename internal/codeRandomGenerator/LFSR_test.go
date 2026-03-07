@@ -10,8 +10,7 @@ import (
 )
 
 var (
-	telegraphAlphabet = []rune("АБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЫЬЭЮЯ_")
-	alphabet          = alpha.NewAlphabet(telegraphAlphabet)
+	alphabet = alpha.NewAlphabet(alpha.TelegraphAlphabet)
 )
 
 func TestAlphabet_Block2Num(t *testing.T) {
@@ -474,29 +473,29 @@ func TestPRNG_AS_LFSR_Push(t *testing.T) {
 		T2 = []int{0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0}
 		T3 = []int{0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 
-		T_set = [][]int{T1, T2, T3}
-		S_set = [][]int{seed1, seed2, seed3}
+		TSet = [][]int{T1, T2, T3}
+		SSet = [][]int{seed1, seed2, seed3}
 
 		Out1 = []int{0, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 1}
 		Out2 = []int{1, 1, 0, 1, 1, 0, 0, 0, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1}
 		Out3 = []int{1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0}
 
-		Out_set = [][]int{Out1, Out2, Out3}
+		OutSet = [][]int{Out1, Out2, Out3}
 	)
 
 	t.Run("AS_LFSR_Push", func(t *testing.T) {
 		lfsr = generator.NewLFSR(*alphabet)
-		kod1, got1 := lfsr.ASLFSR_Push(S_set, T_set)
-		kod2, got2 := lfsr.ASLFSR_Push(got1, T_set)
-		kod3, got3 := lfsr.ASLFSR_Push(got2, T_set)
+		kod1, got1 := lfsr.ASLFSR_Push(SSet, TSet)
+		kod2, got2 := lfsr.ASLFSR_Push(got1, TSet)
+		kod3, got3 := lfsr.ASLFSR_Push(got2, TSet)
 
 		if kod1 != 1 || kod2 != 1 || kod3 != 0 {
-			t.Errorf("Failed AS_LFSR_Push((input=%q, input2=%q), want %v but return %v", S_set, T_set, Out_set, got3)
+			t.Errorf("Failed AS_LFSR_Push((input=%q, input2=%q), want %v but return %v", SSet, TSet, OutSet, got3)
 			return
 		}
 
-		if !reflect.DeepEqual(Out_set, got3) {
-			t.Errorf("Failed AS_LFSR_Push((input=%q, input2=%q), want %v but return %v", S_set, T_set, Out_set, got3)
+		if !reflect.DeepEqual(OutSet, got3) {
+			t.Errorf("Failed AS_LFSR_Push((input=%q, input2=%q), want %v but return %v", SSet, TSet, OutSet, got3)
 			return
 		}
 	})
