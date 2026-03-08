@@ -1,8 +1,10 @@
-package hash
+package hash_test
 
 import (
 	"fmt"
 	alpha "infbez_labs/internal/alphabet"
+	"infbez_labs/internal/core"
+	"infbez_labs/internal/hash"
 	"math/rand"
 	"testing"
 	"time"
@@ -59,6 +61,8 @@ func Test_SpongeHash_Random(t *testing.T) {
 	seed := time.Now().UnixNano()
 	rnd := rand.New(rand.NewSource(seed))
 	alphabet := alpha.NewAlphabet(TelegraphAlphabet)
+	cBlock := core.NewCBlock(*alphabet)
+	hasher := hash.NewHasher(*alphabet, *cBlock)
 
 	inputs := make([]string, 0, numInputs)
 	for i := 0; i < numInputs; i++ {
@@ -71,9 +75,9 @@ func Test_SpongeHash_Random(t *testing.T) {
 
 	t.Run("SmallChange", func(t *testing.T) {
 		for _, p := range inputs {
-			hash1 := SpongeHash(p, *alphabet)
+			hash1 := hasher.Hash(p)
 			changedInput := makeSmallChangeOnBlock(TelegraphAlphabet, p, rnd)
-			hash2 := SpongeHash(changedInput, *alphabet)
+			hash2 := hasher.Hash(changedInput)
 
 			diff := alphabet.SubTxt(hash1, hash2)
 

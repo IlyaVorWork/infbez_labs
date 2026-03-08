@@ -6,23 +6,17 @@ import (
 )
 
 const (
-	DefaultShift     = 8
-	AlphabetSize     = 32
-	ShortBlockLength = 4
-	FullKeyLength    = 16
-	MergeSum         = 24
+	defaultShift  = 8
+	shortBlockLen = 4
+	fullKeyLen    = 16
 )
 
 type Trithemius struct {
 	Alphabet *alphabet.Alphabet
 }
 
-func NewTrithemius(TelegraphAlphabet []rune) *Trithemius {
-	return &Trithemius{alphabet.NewAlphabet(TelegraphAlphabet)}
-}
-
-func NewTrithemiusWithReadyAlphabet(Alphabet alphabet.Alphabet) *Trithemius {
-	return &Trithemius{Alphabet: &Alphabet}
+func NewTrithemius(Alphabet *alphabet.Alphabet) *Trithemius {
+	return &Trithemius{Alphabet: Alphabet}
 }
 
 func (a *Trithemius) BuildTrithemiusAlphabet(key string) []rune {
@@ -35,7 +29,7 @@ func (a *Trithemius) BuildTrithemiusAlphabet(key string) []rune {
 		}
 		for slices.Contains(TrithemiusAlphabet, temp) {
 			receivedKey := a.Alphabet.GetKeyByChar(string(temp))
-			temp = []rune(a.Alphabet.GetCharByKey((receivedKey + 1) % 32))[0]
+			temp = []rune(a.Alphabet.GetCharByKey((receivedKey + 1) % a.Alphabet.AlphabetLength))[0]
 		}
 		TrithemiusAlphabet = append(TrithemiusAlphabet, temp)
 	}
@@ -55,7 +49,7 @@ func (a *Trithemius) EncodeTrithemius(text string, table []rune) string {
 	var out []rune
 	for _, char := range []rune(text) {
 		pos := slices.Index(table, char)
-		newChar := table[(pos+DefaultShift)%32]
+		newChar := table[(pos+defaultShift)%a.Alphabet.AlphabetLength]
 		out = append(out, newChar)
 	}
 	return string(out)
@@ -63,9 +57,10 @@ func (a *Trithemius) EncodeTrithemius(text string, table []rune) string {
 
 func (a *Trithemius) DecodeTrithemius(text string, table []rune) string {
 	var out []rune
+	alphabetLen := a.Alphabet.AlphabetLength
 	for _, char := range []rune(text) {
 		pos := slices.Index(table, char)
-		newChar := table[(32+pos-DefaultShift)%32]
+		newChar := table[(alphabetLen+pos-defaultShift)%alphabetLen]
 		out = append(out, newChar)
 	}
 	return string(out)
@@ -77,7 +72,7 @@ func (a *Trithemius) ShiftTrithemiusAlphabet(table []rune, char string, bias int
 	rem := table[:bias]
 	for slices.Contains(rem, s) {
 		receivedKey := a.Alphabet.GetKeyByChar(string(s))
-		s = []rune(a.Alphabet.GetCharByKey((receivedKey + 1) % 32))[0]
+		s = []rune(a.Alphabet.GetCharByKey((receivedKey + 1) % a.Alphabet.AlphabetLength))[0]
 	}
 	x := slices.Index(str, s)
 	str = slices.Concat(str[:x], str[x+1:])
@@ -93,7 +88,7 @@ func (a *Trithemius) EncodePolyTrithemius(text string, key string) string {
 	for i, char := range runeText {
 
 		k := i % len(keyArr)
-		b := (i + len(keyArr)) % 32
+		b := (i + len(keyArr)) % a.Alphabet.AlphabetLength
 		encodedChar := a.EncodeTrithemius(string(char), table)
 		table = a.ShiftTrithemiusAlphabet(table, a.Alphabet.GetCharByKey(keyArr[k]), b)
 
@@ -112,7 +107,7 @@ func (a *Trithemius) DecodePolyTrithemius(text string, key string) string {
 	for i, char := range runeText {
 
 		k := i % len(keyArr)
-		b := (i + len(keyArr)) % 32
+		b := (i + len(keyArr)) % a.Alphabet.AlphabetLength
 		encodedChar := a.DecodeTrithemius(string(char), table)
 		table = a.ShiftTrithemiusAlphabet(table, a.Alphabet.GetCharByKey(keyArr[k]), b)
 
@@ -124,7 +119,7 @@ func (a *Trithemius) DecodePolyTrithemius(text string, key string) string {
 
 func (a *Trithemius) EncodeSTrithemius(block, key string) string {
 	if !a.validBlockAndKey(block, key) {
-		return "input error"
+		panic("EncodeSTrithemius: Неправильный вход")
 	}
 	return a.EncodePolyTrithemius(block, key)
 
@@ -132,14 +127,14 @@ func (a *Trithemius) EncodeSTrithemius(block, key string) string {
 
 func (a *Trithemius) DecodeSTrithemius(block, key string) string {
 	if !a.validBlockAndKey(block, key) {
-		return "input error"
+		panic("DecodeSTrithemius: Неправильный вход")
 	}
 	return a.DecodePolyTrithemius(block, key)
 }
 
 func (a *Trithemius) EncodeMergeBlock(block, key string) string {
 	if !a.validBlockAndKey(block, key) {
-		return "input error"
+		panic("EncodeMergeBlock: Неправильный вход")
 	}
 
 	M := []int{0, 1, 2, 3}
@@ -171,7 +166,7 @@ func (a *Trithemius) EncodeMergeBlock(block, key string) string {
 
 func (a *Trithemius) DecodeMergeBlock(block, key string) string {
 	if !a.validBlockAndKey(block, key) {
-		return "input error"
+		panic("DecodeMergeBlock: Неправильный вход")
 	}
 
 	M := []int{0, 1, 2, 3}
@@ -195,7 +190,7 @@ func (a *Trithemius) DecodeMergeBlock(block, key string) string {
 	for j := 3; j >= 0; j-- {
 		b := M[(1+j)%4]
 		c := M[j%4]
-		blockArr[b] = (32 + blockArr[b] - blockArr[c]) % 32
+		blockArr[b] = (a.Alphabet.AlphabetLength + blockArr[b] - blockArr[c]) % a.Alphabet.AlphabetLength
 	}
 	return a.Alphabet.ArrayToText(blockArr)
 }
@@ -213,10 +208,5 @@ func (a *Trithemius) DecodeSTrithemiusM(block, key string) string {
 }
 
 func (a *Trithemius) validBlockAndKey(block, key string) bool {
-	const (
-		shortBlockLen = 4
-		fullKeyLen    = 16
-	)
-
 	return len([]rune(block)) == shortBlockLen && len([]rune(key)) == fullKeyLen
 }
