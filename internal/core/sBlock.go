@@ -6,20 +6,27 @@ import (
 )
 
 type SBlock struct {
-	Alphabet alphabet.Alphabet
-	cipher   cipher.Trithemius
+	Alphabet *alphabet.Alphabet
+	cipher   *cipher.Trithemius
 }
 
-func NewSBlock(alphabet alphabet.Alphabet) *SBlock {
+func NewSBlock(alphabet *alphabet.Alphabet) *SBlock {
 	return &SBlock{
 		Alphabet: alphabet,
-		cipher:   *cipher.NewTrithemius(&alphabet),
+		cipher:   cipher.NewTrithemius(alphabet),
 	}
 }
 
-func (s *SBlock) Run(inPrime, inAux string) string {
+func (s *SBlock) FrwRun(inPrime, inAux string) string {
 	if (len([]rune(inPrime)) != 16) || (len([]rune(inAux)) != 16) {
 		panic("неподходящая длина входных данных")
 	}
 	return s.cipher.EncodePolyTrithemius(inAux, inPrime)
+}
+
+func (s *SBlock) InvRun(inPrime, inAux string) string {
+	if (len([]rune(inPrime)) != 16) || (len([]rune(inAux)) != 16) {
+		panic("неподходящая длина входных данных")
+	}
+	return s.cipher.DecodePolyTrithemius(inAux, inPrime)
 }

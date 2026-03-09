@@ -7,11 +7,11 @@ import (
 )
 
 type Hasher struct {
-	alphabet alphabet.Alphabet
-	cBlock   core.CBlock
+	alphabet *alphabet.Alphabet
+	cBlock   *core.CBlock
 }
 
-func NewHasher(alphabet alphabet.Alphabet, cBlock core.CBlock) *Hasher {
+func NewHasher(alphabet *alphabet.Alphabet, cBlock *core.CBlock) *Hasher {
 	return &Hasher{alphabet, cBlock}
 }
 

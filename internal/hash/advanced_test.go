@@ -61,8 +61,8 @@ func Test_SpongeHash_Random(t *testing.T) {
 	seed := time.Now().UnixNano()
 	rnd := rand.New(rand.NewSource(seed))
 	alphabet := alpha.NewAlphabet(TelegraphAlphabet)
-	cBlock := core.NewCBlock(*alphabet)
-	hasher := hash.NewHasher(*alphabet, *cBlock)
+	cBlock := core.NewCBlock(alphabet)
+	hasher := hash.NewHasher(alphabet, cBlock)
 
 	inputs := make([]string, 0, numInputs)
 	for i := 0; i < numInputs; i++ {

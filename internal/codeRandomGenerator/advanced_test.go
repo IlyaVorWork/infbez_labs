@@ -19,7 +19,7 @@ const (
 )
 
 var (
-	lfsr = generator.NewLFSR(*alphabet)
+	lfsr = generator.NewLFSR(alphabet)
 
 	set = [][][]int{
 		{

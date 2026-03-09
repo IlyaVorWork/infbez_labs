@@ -17,8 +17,8 @@ func InitializePRNG(seed string) []string {
 	}
 
 	Alphabet := alphabet.NewAlphabet(alphabet.TelegraphAlphabet)
-	cBLock := core.NewCBlock(*Alphabet)
-	SpongeBob := hasher.NewSponge(hasher.SpongeStarterState, *Alphabet, *cBLock)
+	cBLock := core.NewCBlock(Alphabet)
+	SpongeBob := hasher.NewSponge(hasher.SpongeStarterState, Alphabet, cBLock)
 
 	value := [4]string{}
 	for i := 0; i < 4; i++ {
@@ -40,19 +40,19 @@ func InitializePRNG(seed string) []string {
 	return out[:]
 }
 
-func MakeLfsrSet() [][]int {
-	var tapsSet = make([][]int, 3)
-	tapsSet[0] = TapsToBin([]int{20, 17})
-	tapsSet[1] = TapsToBin([]int{20, 19, 16, 14})
-	tapsSet[2] = TapsToBin([]int{20, 9, 5, 3})
-	return tapsSet
-}
+//func MakeLfsrSet() [][]int {
+//	var tapsSet = make([][]int, 3)
+//	tapsSet[0] = TapsToBin([]int{20, 17})
+//	tapsSet[1] = TapsToBin([]int{20, 19, 16, 14})
+//	tapsSet[2] = TapsToBin([]int{20, 9, 5, 3})
+//	return tapsSet
+//}
 
 type LFSR struct {
-	Alphabet alphabet.Alphabet
+	Alphabet *alphabet.Alphabet
 }
 
-func NewLFSR(Alphabet alphabet.Alphabet) *LFSR {
+func NewLFSR(Alphabet *alphabet.Alphabet) *LFSR {
 	return &LFSR{Alphabet}
 }
 
