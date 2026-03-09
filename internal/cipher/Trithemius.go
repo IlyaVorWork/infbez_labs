@@ -159,7 +159,7 @@ func (a *Trithemius) EncodeMergeBlock(block, key string) string {
 	for j := 0; j < 4; j++ {
 		b := M[(1+j)%4]
 		c := M[j%4]
-		blockArr[b] = (blockArr[b] + blockArr[c]) % 32
+		blockArr[b] = (blockArr[b] + blockArr[c]) % a.Alphabet.AlphabetLength
 	}
 	return a.Alphabet.ArrayToText(blockArr)
 }

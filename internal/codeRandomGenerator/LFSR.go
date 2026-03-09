@@ -40,6 +40,14 @@ func InitializePRNG(seed string) []string {
 	return out[:]
 }
 
+func MakeLfsrSet() [][]int {
+	var tapsSet = make([][]int, 3)
+	tapsSet[0] = TapsToBin([]int{20, 17})
+	tapsSet[1] = TapsToBin([]int{20, 19, 16, 14})
+	tapsSet[2] = TapsToBin([]int{20, 9, 5, 3})
+	return tapsSet
+}
+
 type LFSR struct {
 	Alphabet alphabet.Alphabet
 }
@@ -48,7 +56,7 @@ func NewLFSR(Alphabet alphabet.Alphabet) *LFSR {
 	return &LFSR{Alphabet}
 }
 
-func (l *LFSR) TapsToBin(tapsIn []int) []int {
+func TapsToBin(tapsIn []int) []int {
 	taps := tapsIn
 	slices.Sort(taps)
 	slices.Reverse(taps)

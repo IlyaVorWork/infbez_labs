@@ -323,8 +323,6 @@ func TestPRNG_InitializePRNG(t *testing.T) {
 func TestPRNG_TapsToBin(t *testing.T) {
 
 	var (
-		gen = generator.LFSR{Alphabet: *alphabet}
-
 		Input1 = []int{20, 17}
 		Input2 = []int{19, 18, 17, 4}
 		Input3 = []int{18, 11}
@@ -355,7 +353,7 @@ func TestPRNG_TapsToBin(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := gen.TapsToBin(tt.inputBlock)
+			got := generator.TapsToBin(tt.inputBlock)
 
 			if !reflect.DeepEqual(tt.outputBlock, got) {
 				t.Errorf("Failed TapsToBin((input=%q), want %v but return %v", tt.inputBlock, tt.outputBlock, got)
@@ -559,24 +557,24 @@ func TestPRNG_C_AS_LFSR_Next(t *testing.T) {
 
 		SET = [][][]int{
 			{
-				lfsr.TapsToBin([]int{19, 18}),
-				lfsr.TapsToBin([]int{18, 7}),
-				lfsr.TapsToBin([]int{17, 3}),
+				generator.TapsToBin([]int{19, 18}),
+				generator.TapsToBin([]int{18, 7}),
+				generator.TapsToBin([]int{17, 3}),
 			},
 			{
-				lfsr.TapsToBin([]int{19, 18}),
-				lfsr.TapsToBin([]int{18, 7}),
-				lfsr.TapsToBin([]int{16, 14, 13, 11}),
+				generator.TapsToBin([]int{19, 18}),
+				generator.TapsToBin([]int{18, 7}),
+				generator.TapsToBin([]int{16, 14, 13, 11}),
 			},
 			{
-				lfsr.TapsToBin([]int{19, 18}),
-				lfsr.TapsToBin([]int{18, 7}),
-				lfsr.TapsToBin([]int{15, 13, 12, 10}),
+				generator.TapsToBin([]int{19, 18}),
+				generator.TapsToBin([]int{18, 7}),
+				generator.TapsToBin([]int{15, 13, 12, 10}),
 			},
 			{
-				lfsr.TapsToBin([]int{19, 18}),
-				lfsr.TapsToBin([]int{18, 7}),
-				lfsr.TapsToBin([]int{14, 5, 3, 1}),
+				generator.TapsToBin([]int{19, 18}),
+				generator.TapsToBin([]int{18, 7}),
+				generator.TapsToBin([]int{14, 5, 3, 1}),
 			},
 		}
 

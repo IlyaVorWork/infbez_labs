@@ -23,24 +23,24 @@ var (
 
 	set = [][][]int{
 		{
-			lfsr.TapsToBin([]int{19, 18}),
-			lfsr.TapsToBin([]int{18, 7}),
-			lfsr.TapsToBin([]int{17, 3}),
+			generator.TapsToBin([]int{19, 18}),
+			generator.TapsToBin([]int{18, 7}),
+			generator.TapsToBin([]int{17, 3}),
 		},
 		{
-			lfsr.TapsToBin([]int{19, 18}),
-			lfsr.TapsToBin([]int{18, 7}),
-			lfsr.TapsToBin([]int{16, 14, 13, 11}),
+			generator.TapsToBin([]int{19, 18}),
+			generator.TapsToBin([]int{18, 7}),
+			generator.TapsToBin([]int{16, 14, 13, 11}),
 		},
 		{
-			lfsr.TapsToBin([]int{19, 18}),
-			lfsr.TapsToBin([]int{18, 7}),
-			lfsr.TapsToBin([]int{15, 13, 12, 10}),
+			generator.TapsToBin([]int{19, 18}),
+			generator.TapsToBin([]int{18, 7}),
+			generator.TapsToBin([]int{15, 13, 12, 10}),
 		},
 		{
-			lfsr.TapsToBin([]int{19, 18}),
-			lfsr.TapsToBin([]int{18, 7}),
-			lfsr.TapsToBin([]int{14, 5, 3, 1}),
+			generator.TapsToBin([]int{19, 18}),
+			generator.TapsToBin([]int{18, 7}),
+			generator.TapsToBin([]int{14, 5, 3, 1}),
 		},
 	}
 

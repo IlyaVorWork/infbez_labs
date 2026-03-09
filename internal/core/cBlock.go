@@ -2,7 +2,6 @@ package core
 
 import (
 	alpha "infbez_labs/internal/alphabet"
-	"infbez_labs/internal/cipher"
 )
 
 var cBlockInnerState = [4]string{
@@ -12,25 +11,17 @@ var cBlockInnerState = [4]string{
 	"КАРМАННЫЙ_АТАМАН",
 }
 
-func (c *CBlock) CoreTrithemius(inPrime, inAux string) string {
-	if (len([]rune(inPrime)) != 16) || (len([]rune(inAux)) != 16) {
-		panic("неподходящая длина входных данных")
-	}
-	newTrithemius := cipher.NewTrithemius(&c.alphabet)
-
-	return newTrithemius.EncodePolyTrithemius(inAux, inPrime)
-}
-
 type CBlock struct {
 	state    [4]string
-	cipher   cipher.Trithemius
-	alphabet alpha.Alphabet
+	SBlock   *SBlock
+	alphabet *alpha.Alphabet
 }
 
 func NewCBlock(alpha alpha.Alphabet) *CBlock {
 	return &CBlock{
 		state:    cBlockInnerState,
-		alphabet: alpha,
+		SBlock:   NewSBlock(alpha),
+		alphabet: &alpha,
 	}
 }
 
@@ -52,11 +43,11 @@ func (c *CBlock) Run(inArr []string, outSize int) string {
 		}
 	}
 	c.state = c.mixInnerStateCBlock(c.state)
-	TMP1 := c.CoreTrithemius(c.state[0], c.state[2])
-	TMP2 := c.CoreTrithemius(c.state[3], c.state[1])
+	TMP1 := c.SBlock.Run(c.state[0], c.state[2])
+	TMP2 := c.SBlock.Run(c.state[3], c.state[1])
 	TMP3 := c.Confuse(TMP1, TMP2)
 
-	result := c.CoreTrithemius(TMP3, TMP1)
+	result := c.SBlock.Run(TMP3, TMP1)
 	result = c.Compress(result, outSize)
 	return result
 
