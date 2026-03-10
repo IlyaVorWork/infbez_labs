@@ -11,8 +11,8 @@ import (
 func TestSponge_CBlock(t *testing.T) {
 	var (
 		alphabet = alpha.NewAlphabet(alpha.TelegraphAlphabet)
-		cBlock   = core.NewCBlock(*alphabet)
-		sponge   = hash.NewSponge(hash.SpongeStarterState, *alphabet, *cBlock)
+		cBlock   = core.NewCBlock(alphabet)
+		sponge   = hash.NewSponge(hash.SpongeStarterState, alphabet, cBlock)
 
 		IN1 = []string{"ХОРОШО_БЫТЬ_ВАМИ"}
 		IN2 = []string{"ХОРОШО_БЫТЬ_ВАМИ", "________________", "________________", "________________"}
@@ -152,7 +152,7 @@ func TestSponge_CBlock(t *testing.T) {
 func TestSponge_MixCols_ShatterBlocks_ShiftRows(t *testing.T) {
 	var (
 		alphabet = alpha.NewAlphabet(alpha.TelegraphAlphabet)
-		cBlock   = core.NewCBlock(*alphabet)
+		cBlock   = core.NewCBlock(alphabet)
 
 		state0 = [5][5]string{
 			{"____", "____", "____", "____", "____"},
@@ -162,7 +162,7 @@ func TestSponge_MixCols_ShatterBlocks_ShiftRows(t *testing.T) {
 			{"____", "____", "____", "____", "____"},
 		}
 
-		sponge = hash.NewSponge(state0, *alphabet, *cBlock)
+		sponge = hash.NewSponge(state0, alphabet, cBlock)
 
 		state11 = [5][5]string{
 			{"__М_", "__А_", "__В_", "__М_", "__Т_"},
@@ -305,8 +305,8 @@ func TestSponge_MixCols_ShatterBlocks_ShiftRows(t *testing.T) {
 func TestSponge_SpongeAbsorb(t *testing.T) {
 	var (
 		alphabet = alpha.NewAlphabet(alpha.TelegraphAlphabet)
-		cBlock   = core.NewCBlock(*alphabet)
-		sponge   = hash.NewSponge(hash.SpongeStarterState, *alphabet, *cBlock)
+		cBlock   = core.NewCBlock(alphabet)
+		sponge   = hash.NewSponge(hash.SpongeStarterState, alphabet, cBlock)
 
 		IN1 = "_А__"
 		IN2 = "ВИЛЯ"
@@ -373,7 +373,7 @@ func TestSponge_SpongeSqueeze(t *testing.T) {
 	var (
 		TelegraphAlphabet = []rune("АБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЫЬЭЮЯ_")
 		alphabet          = alpha.NewAlphabet(TelegraphAlphabet)
-		cBlock            = core.NewCBlock(*alphabet)
+		cBlock            = core.NewCBlock(alphabet)
 
 		stateX = [5][5]string{
 			{"БЫ_Щ", "ЙЖ_Б", "ЮФ_Е", "БЫ_Щ", "ЮД_Е"},
@@ -383,7 +383,7 @@ func TestSponge_SpongeSqueeze(t *testing.T) {
 			{"Ы_ЩБ", "____", "Ф_ЕЮ", "Ы_ЩБ", "Д_ЕЮ"},
 		}
 
-		sponge = hash.NewSponge(stateX, *alphabet, *cBlock)
+		sponge = hash.NewSponge(stateX, alphabet, cBlock)
 
 		OUT1 = "ПЮФД"
 		OUT2 = "_ЯГЧ"
@@ -415,8 +415,8 @@ func TestSponge_SpongeSqueeze(t *testing.T) {
 func TestSponge_Hash(t *testing.T) {
 	var (
 		alphabet = alpha.NewAlphabet(alpha.TelegraphAlphabet)
-		cBlock   = core.NewCBlock(*alphabet)
-		hasher   = hash.NewHasher(*alphabet, *cBlock)
+		cBlock   = core.NewCBlock(alphabet)
+		hasher   = hash.NewHasher(alphabet, cBlock)
 
 		IN1 = "КАТЕГОРИЧЕСКИЙ_ИМПЕРАТИВ"
 		IN2 = "________________________________________________________________"

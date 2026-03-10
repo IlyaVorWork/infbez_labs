@@ -3,9 +3,8 @@ package codeRandomGenerator_test
 import (
 	"fmt"
 	alpha "infbez_labs/internal/alphabet"
-	"reflect"
-
 	generator "infbez_labs/internal/codeRandomGenerator"
+	"reflect"
 	"testing"
 )
 
@@ -323,8 +322,6 @@ func TestPRNG_InitializePRNG(t *testing.T) {
 func TestPRNG_TapsToBin(t *testing.T) {
 
 	var (
-		gen = generator.LFSR{Alphabet: *alphabet}
-
 		Input1 = []int{20, 17}
 		Input2 = []int{19, 18, 17, 4}
 		Input3 = []int{18, 11}
@@ -355,7 +352,7 @@ func TestPRNG_TapsToBin(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := gen.TapsToBin(tt.inputBlock)
+			got := generator.TapsToBin(tt.inputBlock)
 
 			if !reflect.DeepEqual(tt.outputBlock, got) {
 				t.Errorf("Failed TapsToBin((input=%q), want %v but return %v", tt.inputBlock, tt.outputBlock, got)
@@ -368,7 +365,7 @@ func TestPRNG_TapsToBin(t *testing.T) {
 func TestPRNG_LFSR_Push(t *testing.T) {
 
 	var (
-		lfsr = generator.NewLFSR(*alphabet)
+		lfsr = generator.NewLFSR(alphabet)
 		S0   = []int{1, 0, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1}
 
 		S1 = []int{0, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 0}
@@ -415,7 +412,7 @@ func TestPRNG_LFSR_Push(t *testing.T) {
 func TestPRNG_LFSR_Next(t *testing.T) {
 
 	var (
-		lfsr = generator.NewLFSR(*alphabet)
+		lfsr = generator.NewLFSR(alphabet)
 
 		seed = alphabet.BlockToBin("ОРИМ")
 		T1   = []int{1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
@@ -443,7 +440,7 @@ func TestPRNG_LFSR_Next(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			lfsr = generator.NewLFSR(*alphabet)
+			lfsr = generator.NewLFSR(alphabet)
 			for i := 1; i < 10; i++ {
 				tt.inputBlock[i] = lfsr.LFSR_Next(tt.inputBlock[i-1], tt.T)[1]
 			}
@@ -463,7 +460,7 @@ func TestPRNG_LFSR_Next(t *testing.T) {
 func TestPRNG_AS_LFSR_Push(t *testing.T) {
 
 	var (
-		lfsr = generator.NewLFSR(*alphabet)
+		lfsr = generator.NewLFSR(alphabet)
 
 		seed1 = alphabet.BlockToBin("ЛЕРА")
 		seed2 = alphabet.BlockToBin("КЛОН")
@@ -484,7 +481,7 @@ func TestPRNG_AS_LFSR_Push(t *testing.T) {
 	)
 
 	t.Run("AS_LFSR_Push", func(t *testing.T) {
-		lfsr = generator.NewLFSR(*alphabet)
+		lfsr = generator.NewLFSR(alphabet)
 		kod1, got1 := lfsr.ASLFSR_Push(SSet, TSet)
 		kod2, got2 := lfsr.ASLFSR_Push(got1, TSet)
 		kod3, got3 := lfsr.ASLFSR_Push(got2, TSet)
@@ -504,7 +501,7 @@ func TestPRNG_AS_LFSR_Push(t *testing.T) {
 func TestPRNG_AS_LFSR_Next(t *testing.T) {
 
 	var (
-		lfsr = generator.NewLFSR(*alphabet)
+		lfsr = generator.NewLFSR(alphabet)
 
 		seed1 = alphabet.BlockToBin("ЛЕРА")
 		seed2 = alphabet.BlockToBin("КЛОН")
@@ -531,7 +528,7 @@ func TestPRNG_AS_LFSR_Next(t *testing.T) {
 	)
 
 	t.Run("AS_LFSR_Push", func(t *testing.T) {
-		lfsr = generator.NewLFSR(*alphabet)
+		lfsr = generator.NewLFSR(alphabet)
 		streams := [10][]int{}
 		stateSets := [10][][]int{}
 		streams[0], stateSets[0] = lfsr.ASLFSR_Next(SSet, TSet)
@@ -555,28 +552,28 @@ func TestPRNG_AS_LFSR_Next(t *testing.T) {
 func TestPRNG_C_AS_LFSR_Next(t *testing.T) {
 
 	var (
-		lfsr = generator.NewLFSR(*alphabet)
+		lfsr = generator.NewLFSR(alphabet)
 
 		SET = [][][]int{
 			{
-				lfsr.TapsToBin([]int{19, 18}),
-				lfsr.TapsToBin([]int{18, 7}),
-				lfsr.TapsToBin([]int{17, 3}),
+				generator.TapsToBin([]int{19, 18}),
+				generator.TapsToBin([]int{18, 7}),
+				generator.TapsToBin([]int{17, 3}),
 			},
 			{
-				lfsr.TapsToBin([]int{19, 18}),
-				lfsr.TapsToBin([]int{18, 7}),
-				lfsr.TapsToBin([]int{16, 14, 13, 11}),
+				generator.TapsToBin([]int{19, 18}),
+				generator.TapsToBin([]int{18, 7}),
+				generator.TapsToBin([]int{16, 14, 13, 11}),
 			},
 			{
-				lfsr.TapsToBin([]int{19, 18}),
-				lfsr.TapsToBin([]int{18, 7}),
-				lfsr.TapsToBin([]int{15, 13, 12, 10}),
+				generator.TapsToBin([]int{19, 18}),
+				generator.TapsToBin([]int{18, 7}),
+				generator.TapsToBin([]int{15, 13, 12, 10}),
 			},
 			{
-				lfsr.TapsToBin([]int{19, 18}),
-				lfsr.TapsToBin([]int{18, 7}),
-				lfsr.TapsToBin([]int{14, 5, 3, 1}),
+				generator.TapsToBin([]int{19, 18}),
+				generator.TapsToBin([]int{18, 7}),
+				generator.TapsToBin([]int{14, 5, 3, 1}),
 			},
 		}
 

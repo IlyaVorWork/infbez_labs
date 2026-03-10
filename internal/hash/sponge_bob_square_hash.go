@@ -16,11 +16,11 @@ var SpongeStarterState = [5][5]string{
 
 type Sponge struct {
 	InnerState [5][5]string
-	Alphabet   alphabet.Alphabet
-	CBlock     core.CBlock
+	Alphabet   *alphabet.Alphabet
+	CBlock     *core.CBlock
 }
 
-func NewSponge(spongeStarterState [5][5]string, Alphabet alphabet.Alphabet, CBlock core.CBlock) *Sponge {
+func NewSponge(spongeStarterState [5][5]string, Alphabet *alphabet.Alphabet, CBlock *core.CBlock) *Sponge {
 	return &Sponge{
 		spongeStarterState,
 		Alphabet,

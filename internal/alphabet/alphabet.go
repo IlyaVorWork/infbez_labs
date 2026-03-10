@@ -148,11 +148,10 @@ func (a *Alphabet) div(dividend, divisor int) int {
 }
 
 func (a *Alphabet) NumToBlock(num int) string {
-	rem := num
 	temp := [4]int{}
 	for i := 0; i < 4; i++ {
-		temp[3-i] = rem % 32
-		rem = a.div(rem, 32)
+		temp[3-i] = num % a.AlphabetLength
+		num = a.div(num, a.AlphabetLength)
 	}
 	return a.ArrayToText(temp[:])
 }
@@ -188,3 +187,37 @@ func (a *Alphabet) BinToBlock(bin []int) string {
 func (a *Alphabet) PushReg(bin []int, boolIn int) []int {
 	return append(bin[1:], boolIn)
 }
+
+// -- Для S-P сети
+
+func (a *Alphabet) SubBlocksXOR(miniBlock1, miniBlock2 string) string {
+	var (
+		miniNumBlock1 = a.BlockToNum(miniBlock1)
+		miniNumBlock2 = a.BlockToNum(miniBlock2)
+	)
+	return a.NumToBlock(miniNumBlock1 ^ miniNumBlock2)
+}
+
+func (a *Alphabet) BlockXOR(block1, block2 string) string {
+	var (
+		resultString = strings.Builder{}
+
+		block1Arr = []rune(block1)
+		block2Arr = []rune(block2)
+	)
+
+	if len(block1Arr) != len(block2Arr) || len(block1Arr)%4 != 0 {
+		panic("BlockXOR: вход имеет неверную длину")
+	}
+
+	resultString.Grow(len(block1Arr))
+
+	for i := 0; i < len(block1Arr); i += 4 {
+		sub1 := string(block1Arr[i : i+4])
+		sub2 := string(block2Arr[i : i+4])
+		resultString.WriteString(a.SubBlocksXOR(sub1, sub2))
+	}
+	return resultString.String()
+}
+
+//func (a *Alphabet)
