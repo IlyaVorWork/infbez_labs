@@ -34,12 +34,12 @@ var (
 
 type SPNet struct {
 	alphabet *alphabet.Alphabet
-	sBlock   *core.SBlock
+	sBlock   *core.SBlockSTM
 	pBlock   *core.PBlock
 	lfsr     *generator.LFSR
 }
 
-func NewSPNet(alphabet *alphabet.Alphabet, sBlock *core.SBlock, pBlock *core.PBlock, lfsr *generator.LFSR) *SPNet {
+func NewSPNet(alphabet *alphabet.Alphabet, sBlock *core.SBlockSTM, pBlock *core.PBlock, lfsr *generator.LFSR) *SPNet {
 	return &SPNet{
 		alphabet: alphabet,
 		sBlock:   sBlock,
@@ -71,12 +71,13 @@ func (s *SPNet) ProduceRoundKeys(key string, roundNum int) []string {
 
 func (s *SPNet) FrwRoundSP(blockIn string, Key string, roundNum int) string {
 	var (
-		builder = strings.Builder{}
+		blockInArr = []rune(blockIn)
+		builder    = strings.Builder{}
 	)
 	builder.Grow(16)
 
 	for i := 0; i < 16; i += 4 {
-		blockPart := blockIn[i : i+4]
+		blockPart := string(blockInArr[i : i+4])
 		builder.WriteString(s.sBlock.FrwRun(blockPart, Key))
 	}
 	afterPBlock := s.pBlock.FrwRound(builder.String(), roundNum)
@@ -91,11 +92,11 @@ func (s *SPNet) InvRoundSP(blockIn string, Key string, roundNum int) string {
 	builder.Grow(16)
 
 	afterXOR := s.alphabet.BlockXOR(blockIn, Key)
-	afterPBlock := s.pBlock.InvRound(afterXOR, roundNum)
+	afterPBlockArr := []rune(s.pBlock.InvRound(afterXOR, roundNum))
 
 	for i := 0; i < 16; i += 4 {
-		blockPart := afterPBlock[i : i+4]
-		builder.WriteString(s.sBlock.FrwRun(blockPart, Key))
+		blockPart := afterPBlockArr[i : i+4]
+		builder.WriteString(s.sBlock.InvRun(string(blockPart), Key))
 	}
 	return builder.String()
 }

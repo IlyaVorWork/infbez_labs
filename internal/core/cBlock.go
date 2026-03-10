@@ -13,14 +13,14 @@ var cBlockInnerState = [4]string{
 
 type CBlock struct {
 	state    [4]string
-	SBlock   *SBlock
+	SBlock   *SBlockPoly
 	alphabet *alpha.Alphabet
 }
 
 func NewCBlock(alpha *alpha.Alphabet) *CBlock {
 	return &CBlock{
 		state:    cBlockInnerState,
-		SBlock:   NewSBlock(alpha),
+		SBlock:   NewSBlockPloy(alpha),
 		alphabet: alpha,
 	}
 }
