@@ -87,20 +87,20 @@ func main() {
 	//fmt.Println(packett.String())
 
 	TST := InputsArray[0]
-	//AD := AssocdataArray[1]
-	//fmt.Println(TST)
-	//
-	//IV1 := []rune("АЛИСА_УМЕЕТ_ПЕТЬ")
-	////IV2 := "БОБ_НЕМНОГО_ПЬЯН"
-	//
-	//cfb := authEncryptionProtocol.NewCFB(telegraphAlphabet)
-	//cfb1 := cfb.Forward([]rune(TST), IV1, "СЕАНСОВЫЙ_КЛЮЧИК", 1)
-	//fmt.Println(cfb1)
-	//fmt.Println(cfb.Invert([]rune(cfb1), IV1, "СЕАНСОВЫЙ_КЛЮЧИК", 1))
+	fmt.Println(TST)
+
+	IV1 := []rune("АЛИСА_УМЕЕТ_ПЕТЬ")
+	//IV2 := "БОБ_НЕМНОГО_ПЬЯН"
+
+	cfb := authEncryptionProtocol.NewCFB(telegraphAlphabet)
+	cfb1 := cfb.Forward([]rune(TST), IV1, "СЕАНСОВЫЙ_КЛЮЧИК", 1)
+	fmt.Println(cfb1)
+	cfd11 := cfb.Invert([]rune(cfb1), IV1, "СЕАНСОВЫЙ_КЛЮЧИК", 1)
+	fmt.Println(cfd11)
 
 	fmt.Println(TST)
 	//fmt.Println(AD)
-
+	fmt.Println("----------Тестики----------")
 	eax := authEncryptionProtocol.NewEAX(telegraphAlphabet)
 
 	SEC := "ТОЖЕ_ЕЩЕ_НЕВАЖНО"
@@ -137,16 +137,28 @@ func main() {
 	fmt.Println("-----------------------Первый-----------------------")
 	msgSend1 := protocol.Send(InputsArray[0])
 	fmt.Println(len(msgSend1))
-	msgSend1 = protocol.Invert(msgSend1, 316)
+	msgSend1 = protocol.Invert(msgSend1, 317)
 	msgRecieve1 := protocol.Recieve(msgSend1)
 	fmt.Println(msgRecieve1.String())
 
 	fmt.Println("-----------------------Второй-----------------------")
+	msgSend2 := protocol.Send(InputsArray[1])
+	fmt.Println(len(msgSend2))
+	msgRecieve2 := protocol.Recieve(msgSend2)
+	fmt.Println(msgRecieve2.String())
+
+	fmt.Println("-----------------------Четвертый-----------------------")
 	msgSend4 := protocol.Send(InputsArray[3])
 	fmt.Println(len(msgSend4))
 	msgSend4 = protocol.Invert(msgSend4, 12)
 	msgRecieve4 := protocol.Recieve(msgSend4)
 	fmt.Println(msgRecieve4.String())
+
+	fmt.Println("-----------------------Пятый-----------------------")
+	msgSend6 := protocol.Send(InputsArray[5])
+	fmt.Println(len(msgSend6))
+	msgRecieve6 := protocol.Recieve(msgSend6)
+	fmt.Println(msgRecieve6.String())
 
 }
 

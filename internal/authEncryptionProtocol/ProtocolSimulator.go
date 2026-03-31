@@ -2,6 +2,7 @@ package authEncryptionProtocol
 
 import (
 	"errors"
+	"fmt"
 	"infbez_labs/internal/alphabet"
 	"slices"
 )
@@ -51,11 +52,11 @@ func (p *ProtocolSimulator) NewConnection(assData AssData, keyIn, nonse string) 
 	data := append(assData.MType[:], assData.Sender[:]...)
 	data = append(data, assData.Reciever[:]...)
 	data = append(data, assData.Transmission[:]...)
-	data = append(data, '_', '_', '_', '_', '_') // 5
+	data = append(data, '_', '_', '_', '_') // 4
 	dataMac := p.EAX.CFB.Forward(data, []rune(secret), keyIn, -1)
 
 	{
-		p.msgCnt = 0
+		p.msgCnt = -1
 		p.last = -1
 		p.iv0 = iv0
 		p.AssData = assData
@@ -104,6 +105,8 @@ func (p *ProtocolSimulator) Recieve(bits []byte) Packet {
 		if slices.Equal(recPacker.MAC, slices.Repeat([]rune{'_'}, 16)) {
 			p.last = current
 			recPacker.MAC = []rune("ОК")
+		} else {
+			fmt.Println("Блфть")
 		}
 		out = recPacker
 

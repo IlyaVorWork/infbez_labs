@@ -59,7 +59,7 @@ func (e *EAX) InvertEaxCfb(packet Packet, spNetSeed, secIn string, mac int8) Pac
 	data = append(data, packet.AssocData.Sender[:]...)
 	data = append(data, packet.AssocData.Reciever[:]...)
 	data = append(data, packet.AssocData.Transmission[:]...)
-	data = append(data, []rune("_____")...)
+	data = append(data, []rune("____")...)
 
 	cMAC := e.CFB.Forward(data, []rune(secIn), spNetSeed, -1)
 	cIV := []rune(e.CFB.Forward(append([]rune(secIn), tmp...), packet.IV, spNetSeed, -1))
@@ -67,7 +67,7 @@ func (e *EAX) InvertEaxCfb(packet Packet, spNetSeed, secIn string, mac int8) Pac
 		tmp = []rune(e.CFB.Forward(packet.Message, cIV, spNetSeed, -1))
 		tmp = e.CFB.alphabet.BlockXOR(tmp, cIV)
 		MAC = e.CFB.alphabet.BlockXOR(tmp, []rune(cMAC))
-		MAC = e.CFB.alphabet.BlockXOR(packet.MAC, []rune(cMAC))
+		MAC = e.CFB.alphabet.BlockXOR(packet.MAC, MAC)
 		MSG = packet.Message
 	} else {
 		cont := e.CFB.alphabet.BlockXOR(packet.MAC, cIV)
@@ -82,7 +82,7 @@ func (e *EAX) InvertEaxCfb(packet Packet, spNetSeed, secIn string, mac int8) Pac
 
 	return Packet{
 		AssocData: packet.AssocData,
-		IV:        cIV,
+		IV:        packet.IV,
 		Message:   MSG,
 		MAC:       MAC,
 	}
