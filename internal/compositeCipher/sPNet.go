@@ -81,8 +81,8 @@ func (s *SPNet) FrwRoundSP(blockIn string, Key string, roundNum int) string {
 		builder.WriteString(s.sBlock.FrwRun(blockPart, Key))
 	}
 	afterPBlock := s.pBlock.FrwRound(builder.String(), roundNum)
-	result := s.alphabet.BlockXOR(afterPBlock, Key)
-	return result
+	result := s.alphabet.BlockXOR([]rune(afterPBlock), []rune(Key))
+	return string(result)
 }
 
 func (s *SPNet) InvRoundSP(blockIn string, Key string, roundNum int) string {
@@ -91,8 +91,8 @@ func (s *SPNet) InvRoundSP(blockIn string, Key string, roundNum int) string {
 	)
 	builder.Grow(16)
 
-	afterXOR := s.alphabet.BlockXOR(blockIn, Key)
-	afterPBlockArr := []rune(s.pBlock.InvRound(afterXOR, roundNum))
+	afterXOR := s.alphabet.BlockXOR([]rune(blockIn), []rune(Key))
+	afterPBlockArr := []rune(s.pBlock.InvRound(string(afterXOR), roundNum))
 
 	for i := 0; i < 16; i += 4 {
 		blockPart := afterPBlockArr[i : i+4]

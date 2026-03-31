@@ -12,12 +12,12 @@ import (
 
 func TestCompositeCipher_XOR(t *testing.T) {
 	var (
-		inA  = "АГАТ"
-		inA1 = "КОЛЕНЬКА"
-		inA2 = "ТОРТ_ХОЧЕТ_ГОРКУ"
-		inB  = "ТАГА"
-		inB1 = "МТВ_ТЛЕН"
-		inB2 = "МТВ_ВСЕ_ЕЩЕ_ТЛЕН"
+		inA  = []rune("АГАТ")
+		inA1 = []rune("КОЛЕНЬКА")
+		inA2 = []rune("ТОРТ_ХОЧЕТ_ГОРКУ")
+		inB  = []rune("ТАГА")
+		inB1 = []rune("МТВ_ТЛЕН")
+		inB2 = []rune("МТВ_ВСЕ_ЕЩЕ_ТЛЕН")
 
 		sub1out     = "СДДС"
 		block1out   = "СДДС"
@@ -32,19 +32,19 @@ func TestCompositeCipher_XOR(t *testing.T) {
 	tests := []struct {
 		name   string
 		action string
-		input1 string
-		input2 string
+		input1 []rune
+		input2 []rune
 		output string
 	}{
-		{fmt.Sprintf("%s+%s->%s", inA, inB, sub1out), "subblock", inA, inB, sub1out},
-		{fmt.Sprintf("%s+%s->%s", inA, inB, block1out), "block", inA, inB, block1out},
-		{fmt.Sprintf("%s+%s->%s", inA, inB, addText1out), "addtext", inA, inB, addText1out},
-		{fmt.Sprintf("%s+%s->%s", inA1, inB1, block2out), "block", inA1, inB1, block2out},
-		{fmt.Sprintf("%s+%s->%s", inA2, inB2, block3out), "block", inA2, inB2, block3out},
-		{fmt.Sprintf("%s+%s->%s", inA1, inB1, addText2out), "addtext", inA1, inB1, addText2out},
-		{fmt.Sprintf("%s+%s->%s", inA2, inB2, addText3out), "addtext", inA2, inB2, addText3out},
-		{fmt.Sprintf("%s+%s->%s", block3out, inB2, inA2), "block", block3out, inB2, inA2},
-		{fmt.Sprintf("%s+%s->%s", block3out, inA2, inB2), "block", block3out, inA2, inB2},
+		{fmt.Sprintf("%s+%s->%s", string(inA), string(inB), sub1out), "subblock", inA, inB, sub1out},
+		{fmt.Sprintf("%s+%s->%s", string(inA), string(inB), block1out), "block", inA, inB, block1out},
+		{fmt.Sprintf("%s+%s->%s", string(inA), string(inB), addText1out), "addtext", inA, inB, addText1out},
+		{fmt.Sprintf("%s+%s->%s", string(inA1), string(inB1), block2out), "block", inA1, inB1, block2out},
+		{fmt.Sprintf("%s+%s->%s", string(inA2), string(inB2), block3out), "block", inA2, inB2, block3out},
+		{fmt.Sprintf("%s+%s->%s", string(inA1), string(inB1), addText2out), "addtext", inA1, inB1, addText2out},
+		{fmt.Sprintf("%s+%s->%s", string(inA2), string(inB2), addText3out), "addtext", inA2, inB2, addText3out},
+		{fmt.Sprintf("%s+%s->%s", block3out, string(inB2), string(inA2)), "block", []rune(block3out), inB2, string(inA2)},
+		{fmt.Sprintf("%s+%s->%s", block3out, string(inA2), string(inB2)), "block", []rune(block3out), inA2, string(inB2)},
 	}
 
 	for _, tt := range tests {
@@ -54,15 +54,15 @@ func TestCompositeCipher_XOR(t *testing.T) {
 			var got string
 			switch tt.action {
 			case "subblock":
-				got = Alphabet.SubBlocksXOR(tt.input1, tt.input2)
+				got = string(Alphabet.SubBlocksXOR(tt.input1, tt.input2))
 			case "block":
-				got = Alphabet.BlockXOR(tt.input1, tt.input2)
+				got = string(Alphabet.BlockXOR(tt.input1, tt.input2))
 			case "addtext":
-				got = Alphabet.AddTxt(tt.input1, tt.input2)
+				got = Alphabet.AddTxt(string(tt.input1), string(tt.input2))
 			}
 
 			if tt.output != got {
-				t.Errorf("Failed %s(input1=%s, input2=%s), want %s but return %s", tt.action, tt.input1, tt.input2, tt.output, got)
+				t.Errorf("Failed %s(input1=%s, input2=%s), want %s but return %s", tt.action, string(tt.input1), string(tt.input2), tt.output, got)
 				return
 			}
 		})

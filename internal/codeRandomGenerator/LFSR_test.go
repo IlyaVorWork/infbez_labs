@@ -5,6 +5,7 @@ import (
 	alpha "infbez_labs/internal/alphabet"
 	generator "infbez_labs/internal/codeRandomGenerator"
 	"reflect"
+	"slices"
 	"testing"
 )
 
@@ -15,9 +16,9 @@ var (
 func TestAlphabet_Block2Num(t *testing.T) {
 
 	var (
-		Input1 = "АБВГ"
-		Input2 = "_ЯЗЬ"
-		Input3 = "ЯЯЯЯ"
+		Input1 = []rune("АБВГ")
+		Input2 = []rune("_ЯЗЬ")
+		Input3 = []rune("ЯЯЯЯ")
 
 		Output1 = 34916
 		Output2 = 32028
@@ -26,12 +27,12 @@ func TestAlphabet_Block2Num(t *testing.T) {
 
 	tests := []struct {
 		name        string
-		inputBlock  string
+		inputBlock  []rune
 		outputBlock int
 	}{
-		{Input1 + "->" + fmt.Sprint(Output1), Input1, Output1},
-		{Input2 + "->" + fmt.Sprint(Output2), Input2, Output2},
-		{Input3 + "->" + fmt.Sprint(Output3), Input3, Output3},
+		{string(Input1) + "->" + fmt.Sprint(Output1), Input1, Output1},
+		{string(Input2) + "->" + fmt.Sprint(Output2), Input2, Output2},
+		{string(Input3) + "->" + fmt.Sprint(Output3), Input3, Output3},
 	}
 
 	for _, tt := range tests {
@@ -49,9 +50,9 @@ func TestAlphabet_Block2Num(t *testing.T) {
 func TestAlphabet_Num2Block(t *testing.T) {
 
 	var (
-		Output1 = "АБВГ"
-		Output2 = "_ЯЗЬ"
-		Output3 = "ЯЯЯЯ"
+		Output1 = []rune("АБВГ")
+		Output2 = []rune("_ЯЗЬ")
+		Output3 = []rune("ЯЯЯЯ")
 
 		Input1 = 34916
 		Input2 = 32028
@@ -61,18 +62,18 @@ func TestAlphabet_Num2Block(t *testing.T) {
 	tests := []struct {
 		name        string
 		inputBlock  int
-		outputBlock string
+		outputBlock []rune
 	}{
-		{fmt.Sprint(Input1) + "->" + Output1, Input1, Output1},
-		{fmt.Sprint(Input2) + "->" + Output2, Input2, Output2},
-		{fmt.Sprint(Input3) + "->" + Output3, Input3, Output3},
+		{fmt.Sprint(Input1) + "->" + string(Output1), Input1, Output1},
+		{fmt.Sprint(Input2) + "->" + string(Output2), Input2, Output2},
+		{fmt.Sprint(Input3) + "->" + string(Output3), Input3, Output3},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := alphabet.NumToBlock(tt.inputBlock)
 
-			if tt.outputBlock != got {
+			if !slices.Equal(tt.outputBlock, got) {
 				t.Errorf("Failed Num2Block(input=%q), want %v but return %v", tt.inputBlock, tt.outputBlock, got)
 				return
 			}
@@ -151,10 +152,10 @@ func TestAlphabet_Bin2Dec(t *testing.T) {
 func TestAlphabet_Block2Bin(t *testing.T) {
 
 	var (
-		Input1 = "____"
-		Input2 = "___А"
-		Input3 = "__Б_"
-		Input4 = "__БГ"
+		Input1 = []rune("____")
+		Input2 = []rune("___А")
+		Input3 = []rune("__Б_")
+		Input4 = []rune("__БГ")
 
 		Output1 = []int{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 		Output2 = []int{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1}
@@ -164,7 +165,7 @@ func TestAlphabet_Block2Bin(t *testing.T) {
 
 	tests := []struct {
 		name        string
-		inputBlock  string
+		inputBlock  []rune
 		outputBlock []int
 	}{
 		{fmt.Sprint(Input1) + "->" + fmt.Sprint(Output1), Input1, Output1},
@@ -193,16 +194,16 @@ func TestAlphabet_Bin2Block(t *testing.T) {
 		Input3 = []int{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0}
 		Input4 = []int{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0}
 
-		Output1 = "____"
-		Output2 = "___А"
-		Output3 = "__Б_"
-		Output4 = "__БГ"
+		Output1 = []rune("____")
+		Output2 = []rune("___А")
+		Output3 = []rune("__Б_")
+		Output4 = []rune("__БГ")
 	)
 
 	tests := []struct {
 		name        string
 		inputBlock  []int
-		outputBlock string
+		outputBlock []rune
 	}{
 		{fmt.Sprint(Input1) + "->" + fmt.Sprint(Output1), Input1, Output1},
 		{fmt.Sprint(Input2) + "->" + fmt.Sprint(Output2), Input2, Output2},
@@ -214,7 +215,7 @@ func TestAlphabet_Bin2Block(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got := alphabet.BinToBlock(tt.inputBlock)
 
-			if !reflect.DeepEqual(tt.outputBlock, got) {
+			if !slices.Equal(tt.outputBlock, got) {
 				t.Errorf("Failed Bin2Block((input=%q), want %v but return %v", tt.inputBlock, tt.outputBlock, got)
 				return
 			}
@@ -414,7 +415,7 @@ func TestPRNG_LFSR_Next(t *testing.T) {
 	var (
 		lfsr = generator.NewLFSR(alphabet)
 
-		seed = alphabet.BlockToBin("ОРИМ")
+		seed = alphabet.BlockToBin([]rune("ОРИМ"))
 		T1   = []int{1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 		T2   = []int{0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0}
 
@@ -446,7 +447,7 @@ func TestPRNG_LFSR_Next(t *testing.T) {
 			}
 			var got []string
 			for i := 1; i < 10; i++ {
-				got = append(got, alphabet.BinToBlock(tt.inputBlock[i]))
+				got = append(got, string(alphabet.BinToBlock(tt.inputBlock[i])))
 			}
 
 			if !reflect.DeepEqual(tt.outputBlock, got) {
@@ -462,9 +463,9 @@ func TestPRNG_AS_LFSR_Push(t *testing.T) {
 	var (
 		lfsr = generator.NewLFSR(alphabet)
 
-		seed1 = alphabet.BlockToBin("ЛЕРА")
-		seed2 = alphabet.BlockToBin("КЛОН")
-		seed3 = alphabet.BlockToBin("КОНЯ")
+		seed1 = alphabet.BlockToBin([]rune("ЛЕРА"))
+		seed2 = alphabet.BlockToBin([]rune("КЛОН"))
+		seed3 = alphabet.BlockToBin([]rune("КОНЯ"))
 
 		T1 = []int{1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 		T2 = []int{0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0}
@@ -503,9 +504,9 @@ func TestPRNG_AS_LFSR_Next(t *testing.T) {
 	var (
 		lfsr = generator.NewLFSR(alphabet)
 
-		seed1 = alphabet.BlockToBin("ЛЕРА")
-		seed2 = alphabet.BlockToBin("КЛОН")
-		seed3 = alphabet.BlockToBin("КОНЯ")
+		seed1 = alphabet.BlockToBin([]rune("ЛЕРА"))
+		seed2 = alphabet.BlockToBin([]rune("КЛОН"))
+		seed3 = alphabet.BlockToBin([]rune("КОНЯ"))
 
 		T1 = []int{1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 		T2 = []int{0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0}
@@ -539,7 +540,7 @@ func TestPRNG_AS_LFSR_Next(t *testing.T) {
 
 		got := make([]string, 9)
 		for i := 1; i < 10; i++ {
-			got[i-1] = alphabet.BinToBlock(streams[i])
+			got[i-1] = string(alphabet.BinToBlock(streams[i]))
 		}
 
 		if !reflect.DeepEqual(OutSet, got) {

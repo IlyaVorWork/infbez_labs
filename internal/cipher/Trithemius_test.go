@@ -56,23 +56,23 @@ func TestTrithemius_GetCharByKey(t *testing.T) {
 		Key4 = 14
 		Key5 = 32
 
-		OutputChar1 = "_"
-		OutputChar2 = "А"
-		OutputChar3 = "Ж"
-		OutputChar4 = "Н"
-		OutputChar5 = "_"
+		OutputChar1 = '_'
+		OutputChar2 = 'А'
+		OutputChar3 = 'Ж'
+		OutputChar4 = 'Н'
+		OutputChar5 = '_'
 	)
 
 	tests := []struct {
 		name       string
 		inputKey   int
-		outputChar string
+		outputChar rune
 	}{
-		{fmt.Sprint(Key1) + "->" + OutputChar1, Key1, OutputChar1},
-		{fmt.Sprint(Key2) + "->" + OutputChar2, Key2, OutputChar2},
-		{fmt.Sprint(Key3) + "->" + OutputChar3, Key3, OutputChar3},
-		{fmt.Sprint(Key4) + "->" + OutputChar4, Key4, OutputChar4},
-		{fmt.Sprint(Key5) + "->" + OutputChar5, Key5, OutputChar5},
+		{fmt.Sprint(Key1, "->", OutputChar1), Key1, OutputChar1},
+		{fmt.Sprint(Key2, "->", OutputChar2), Key2, OutputChar2},
+		{fmt.Sprint(Key3, "->", OutputChar3), Key3, OutputChar3},
+		{fmt.Sprint(Key4, "->", OutputChar4), Key4, OutputChar4},
+		{fmt.Sprint(Key5, "->", OutputChar5), Key5, OutputChar5},
 	}
 
 	for _, tt := range tests {
@@ -90,11 +90,11 @@ func TestTrithemius_GetKeyByChar(t *testing.T) {
 	trithemius := cipher.NewTrithemius(Alphabet)
 
 	var (
-		InputChar1 = "_"
-		InputChar2 = "А"
-		InputChar3 = "Ж"
-		InputChar4 = "Н"
-		InputChar5 = "Е"
+		InputChar1 = '_'
+		InputChar2 = 'А'
+		InputChar3 = 'Ж'
+		InputChar4 = 'Н'
+		InputChar5 = 'Е'
 
 		OutputKey1 = 0
 		OutputKey2 = 1
@@ -105,19 +105,19 @@ func TestTrithemius_GetKeyByChar(t *testing.T) {
 
 	tests := []struct {
 		name      string
-		inputChar string
+		inputChar rune
 		OutputKey int
 	}{
-		{InputChar1 + "->" + fmt.Sprint(OutputKey1), InputChar1, OutputKey1},
-		{InputChar2 + "->" + fmt.Sprint(OutputKey2), InputChar2, OutputKey2},
-		{InputChar3 + "->" + fmt.Sprint(OutputKey3), InputChar3, OutputKey3},
-		{InputChar4 + "->" + fmt.Sprint(OutputKey4), InputChar4, OutputKey4},
-		{InputChar5 + "->" + fmt.Sprint(OutputKey5), InputChar5, OutputKey5},
+		{fmt.Sprint(InputChar1, "->", OutputKey1), InputChar1, OutputKey1},
+		{fmt.Sprint(InputChar2, "->", OutputKey2), InputChar2, OutputKey2},
+		{fmt.Sprint(InputChar3, "->", OutputKey3), InputChar3, OutputKey3},
+		{fmt.Sprint(InputChar4, "->", OutputKey4), InputChar4, OutputKey4},
+		{fmt.Sprint(InputChar5, "->", OutputKey5), InputChar5, OutputKey5},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := trithemius.Alphabet.GetKeyByChar(tt.inputChar); tt.OutputKey != got {
+			if got, ok := trithemius.Alphabet.GetKeyByChar(tt.inputChar); tt.OutputKey != got || !ok {
 				t.Errorf("Failed GetKeyByChar(Char=%v), want %v but return %v", tt.inputChar, tt.OutputKey, got)
 				return
 			}
@@ -200,30 +200,30 @@ func TestTrithemius_ArrayToText(t *testing.T) {
 	)
 
 	var (
-		OUT1 = "АБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЫЬЭЮЯ_"
-		OUT2 = "_____"
-		OUT3 = "АГГ"
-		OUT4 = "ЙЦУКЕН"
-		OUT5 = "МИР"
+		OUT1 = []rune("АБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЫЬЭЮЯ_")
+		OUT2 = []rune("_____")
+		OUT3 = []rune("АГГ")
+		OUT4 = []rune("ЙЦУКЕН")
+		OUT5 = []rune("МИР")
 	)
 
 	tests := []struct {
 		name       string
 		inputArray []int
-		outputText string
+		outputText []rune
 	}{
-		{fmt.Sprint(IN1) + "->" + OUT1, IN1, OUT1},
-		{fmt.Sprint(IN2) + "->" + OUT2, IN2, OUT2},
-		{fmt.Sprint(IN3) + "->" + OUT3, IN3, OUT3},
-		{fmt.Sprint(IN4) + "->" + OUT4, IN4, OUT4},
-		{fmt.Sprint(IN5) + "->" + OUT5, IN5, OUT5},
+		{fmt.Sprint(IN1) + "->" + string(OUT1), IN1, OUT1},
+		{fmt.Sprint(IN2) + "->" + string(OUT2), IN2, OUT2},
+		{fmt.Sprint(IN3) + "->" + string(OUT3), IN3, OUT3},
+		{fmt.Sprint(IN4) + "->" + string(OUT4), IN4, OUT4},
+		{fmt.Sprint(IN5) + "->" + string(OUT5), IN5, OUT5},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := trithemius.Alphabet.ArrayToText(tt.inputArray)
 
-			if got != tt.outputText {
+			if !slices.Equal(got, tt.outputText) {
 				t.Errorf("ArrayToText(array=%q), want %q but return %q", tt.inputArray, tt.outputText, got)
 				return
 			}
@@ -235,11 +235,11 @@ func TestTrithemius_TextToArray(t *testing.T) {
 	trithemius := cipher.NewTrithemius(Alphabet)
 
 	var (
-		IN1 = "АБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЫЬЭЮЯ_"
-		IN2 = "_____"
-		IN3 = "АГГ"
-		IN4 = "ЙЦУКЕН"
-		IN5 = "МИР"
+		IN1 = []rune("АБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЫЬЭЮЯ_")
+		IN2 = []rune("_____")
+		IN3 = []rune("АГГ")
+		IN4 = []rune("ЙЦУКЕН")
+		IN5 = []rune("МИР")
 	)
 
 	var (
@@ -252,14 +252,14 @@ func TestTrithemius_TextToArray(t *testing.T) {
 
 	tests := []struct {
 		name        string
-		inputText   string
+		inputText   []rune
 		outputArray []int
 	}{
-		{IN1 + "->" + fmt.Sprint(OUT1), IN1, OUT1},
-		{IN2 + "->" + fmt.Sprint(OUT2), IN2, OUT2},
-		{IN3 + "->" + fmt.Sprint(OUT3), IN3, OUT3},
-		{IN4 + "->" + fmt.Sprint(OUT4), IN4, OUT4},
-		{IN5 + "->" + fmt.Sprint(OUT5), IN5, OUT5},
+		{string(IN1) + "->" + fmt.Sprint(OUT1), IN1, OUT1},
+		{string(IN2) + "->" + fmt.Sprint(OUT2), IN2, OUT2},
+		{string(IN3) + "->" + fmt.Sprint(OUT3), IN3, OUT3},
+		{string(IN4) + "->" + fmt.Sprint(OUT4), IN4, OUT4},
+		{string(IN5) + "->" + fmt.Sprint(OUT5), IN5, OUT5},
 	}
 
 	for _, tt := range tests {
@@ -366,9 +366,9 @@ func TestTrithemius_ShiftTrithemiusAlphabet(t *testing.T) {
 	var (
 		table = trithemius.BuildTrithemiusAlphabet("ХОРОШО_БЫТЬ_ВАМИ")
 
-		SymIn1 = "Х"
-		SymIn2 = "Я"
-		SymIn3 = "А"
+		CharIn1 = 'Х'
+		CharIn2 = 'Я'
+		CharIn3 = 'А'
 
 		BIAS1 = 16
 		BIAS2 = 18
@@ -388,24 +388,24 @@ func TestTrithemius_ShiftTrithemiusAlphabet(t *testing.T) {
 
 	tests := []struct {
 		name        string
-		inputSym    string
+		inputChar   rune
 		inputBias   int
 		outputTable string
 	}{
-		{SymIn1 + "||" + string(rune(BIAS1)) + "->" + K1, SymIn1, BIAS1, K1},
-		{SymIn1 + "||" + string(rune(BIAS2)) + "->" + K2, SymIn1, BIAS2, K2},
-		{SymIn2 + "||" + string(rune(BIAS1)) + "->" + K3, SymIn2, BIAS1, K3},
-		{SymIn3 + "||" + string(rune(BIAS3)) + "->" + K4, SymIn3, BIAS3, K4},
-		{SymIn3 + "||" + string(rune(BIAS4)) + "->" + K5, SymIn3, BIAS4, K5},
-		{SymIn3 + "||" + string(rune(BIAS5)) + "->" + K6, SymIn3, BIAS5, K6},
-		{SymIn3 + "||" + string(rune(BIAS6)) + "->" + K7, SymIn3, BIAS6, K7},
+		{fmt.Sprint(CharIn1, "||", string(rune(BIAS1)), "->", K1), CharIn1, BIAS1, K1},
+		{fmt.Sprint(CharIn1, "||", string(rune(BIAS2)), "->", K2), CharIn1, BIAS2, K2},
+		{fmt.Sprint(CharIn2, "||", string(rune(BIAS1)), "->", K3), CharIn2, BIAS1, K3},
+		{fmt.Sprint(CharIn3, "||", string(rune(BIAS3)), "->", K4), CharIn3, BIAS3, K4},
+		{fmt.Sprint(CharIn3, "||", string(rune(BIAS4)), "->", K5), CharIn3, BIAS4, K5},
+		{fmt.Sprint(CharIn3, "||", string(rune(BIAS5)), "->", K6), CharIn3, BIAS5, K6},
+		{fmt.Sprint(CharIn3, "||", string(rune(BIAS6)), "->", K7), CharIn3, BIAS6, K7},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := string(trithemius.ShiftTrithemiusAlphabet(table, tt.inputSym, tt.inputBias))
+			got := string(trithemius.ShiftTrithemiusAlphabet(table, tt.inputChar, tt.inputBias))
 			if tt.outputTable != got {
-				t.Errorf("Failed ShiftTrithemiusAlphabet(sym=%v, bias%v), want %v but return %v", tt.inputSym, tt.inputBias, tt.outputTable, got)
+				t.Errorf("Failed ShiftTrithemiusAlphabet(sym=%v, bias%v), want %v but return %v", tt.inputChar, tt.inputBias, tt.outputTable, got)
 				return
 			}
 		})

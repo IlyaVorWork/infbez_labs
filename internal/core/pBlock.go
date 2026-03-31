@@ -2,7 +2,6 @@ package core
 
 import (
 	"infbez_labs/internal/alphabet"
-	"strings"
 )
 
 var (
@@ -117,7 +116,7 @@ func (pb *PBlock) Text16CharTo80Bit(block string) []int {
 	)
 
 	for i := 0; i < 16; i += 4 {
-		binsBlock = pb.alphabet.BlockToBin(string(inputBlockArr[i : i+4]))
+		binsBlock = pb.alphabet.BlockToBin(inputBlockArr[i : i+4])
 		bits = append(bits, binsBlock...)
 	}
 	return bits
@@ -129,16 +128,15 @@ func (pb *PBlock) Text80BitTo16Char(bits []int) string {
 	}
 
 	var (
-		builder   = strings.Builder{}
+		out       = make([]rune, 0, 16)
 		BinsBlock []int
 	)
-	builder.Grow(16)
 
 	for i := 0; i < 4; i++ {
 		BinsBlock = bits[i*20 : i*20+20]
-		builder.WriteString(pb.alphabet.BinToBlock(BinsBlock))
+		out = append(out, pb.alphabet.BinToBlock(BinsBlock)...)
 	}
-	return builder.String()
+	return string(out)
 }
 
 func (pb *PBlock) isInput16CharValidate(block string) bool {

@@ -46,9 +46,9 @@ func (s *Sponge) MixCols() [5][5]string {
 }
 
 func (s *Sponge) ShiftBlock(block string) string {
-	blockArr := s.Alphabet.TextToArray(block)
+	blockArr := s.Alphabet.TextToArray([]rune(block))
 	shifted := append(blockArr[len(blockArr)-1:], blockArr[:len(blockArr)-1]...)
-	return s.Alphabet.ArrayToText(shifted)
+	return string(s.Alphabet.ArrayToText(shifted))
 }
 
 func (s *Sponge) ShatterBlocks() [5][5]string {

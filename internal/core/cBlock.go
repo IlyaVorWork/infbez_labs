@@ -58,14 +58,14 @@ func (c *CBlock) resetState() {
 }
 
 func (c *CBlock) Confuse(In1, In2 string) string {
-	arr1 := c.alphabet.TextToArray(In1)
-	arr2 := c.alphabet.TextToArray(In2)
+	arr1 := c.alphabet.TextToArray([]rune(In1))
+	arr2 := c.alphabet.TextToArray([]rune(In2))
 	for i := 0; i < 16; i++ {
 		arr1[i] = (max(arr1[i], arr2[i]) + i) % c.alphabet.AlphabetLength
 	}
 	result := c.alphabet.ArrayToText(arr1)
 
-	return c.alphabet.AddTxt(c.alphabet.AddTxt(result, In1), In2)
+	return c.alphabet.AddTxt(c.alphabet.AddTxt(string(result), In1), In2)
 }
 
 func (c *CBlock) Compress(In16 string, outN int) string {

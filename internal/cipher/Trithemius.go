@@ -28,8 +28,11 @@ func (a *Trithemius) BuildTrithemiusAlphabet(key string) []rune {
 			break
 		}
 		for slices.Contains(TrithemiusAlphabet, temp) {
-			receivedKey := a.Alphabet.GetKeyByChar(string(temp))
-			temp = []rune(a.Alphabet.GetCharByKey((receivedKey + 1) % a.Alphabet.AlphabetLength))[0]
+			receivedKey, ok := a.Alphabet.GetKeyByChar(temp)
+			if !ok {
+				panic("BuildTrithemiusAlphabet: Неправильный символ")
+			}
+			temp = a.Alphabet.GetCharByKey((receivedKey + 1) % a.Alphabet.AlphabetLength)
 		}
 		TrithemiusAlphabet = append(TrithemiusAlphabet, temp)
 	}
@@ -66,13 +69,16 @@ func (a *Trithemius) DecodeTrithemius(text string, table []rune) string {
 	return string(out)
 }
 
-func (a *Trithemius) ShiftTrithemiusAlphabet(table []rune, char string, bias int) []rune {
-	s := []rune(char)[0]
+func (a *Trithemius) ShiftTrithemiusAlphabet(table []rune, char rune, bias int) []rune {
+	s := char
 	str := table[bias:]
 	rem := table[:bias]
 	for slices.Contains(rem, s) {
-		receivedKey := a.Alphabet.GetKeyByChar(string(s))
-		s = []rune(a.Alphabet.GetCharByKey((receivedKey + 1) % a.Alphabet.AlphabetLength))[0]
+		receivedKey, ok := a.Alphabet.GetKeyByChar(s)
+		if !ok {
+			panic("BuildTrithemiusAlphabet: Неправильный символ")
+		}
+		s = a.Alphabet.GetCharByKey((receivedKey + 1) % a.Alphabet.AlphabetLength)
 	}
 	x := slices.Index(str, s)
 	str = slices.Concat(str[:x], str[x+1:])
@@ -84,7 +90,7 @@ func (a *Trithemius) EncodePolyTrithemius(text string, key string) string {
 
 	runeText := []rune(text)
 	table := a.BuildTrithemiusAlphabet(key)
-	keyArr := a.Alphabet.TextToArray(key)
+	keyArr := a.Alphabet.TextToArray([]rune(key))
 	for i, char := range runeText {
 
 		k := i % len(keyArr)
@@ -103,7 +109,7 @@ func (a *Trithemius) DecodePolyTrithemius(text string, key string) string {
 
 	runeText := []rune(text)
 	table := a.BuildTrithemiusAlphabet(key)
-	keyArr := a.Alphabet.TextToArray(key)
+	keyArr := a.Alphabet.TextToArray([]rune(key))
 	for i, char := range runeText {
 
 		k := i % len(keyArr)
@@ -139,7 +145,7 @@ func (a *Trithemius) EncodeMergeBlock(block, key string) string {
 
 	M := []int{0, 1, 2, 3}
 
-	keyArr := a.Alphabet.TextToArray(key)
+	keyArr := a.Alphabet.TextToArray([]rune(key))
 	var sum int
 	for i := 0; i < 16; i++ {
 		sign := 1
@@ -155,13 +161,13 @@ func (a *Trithemius) EncodeMergeBlock(block, key string) string {
 		M[k] = M[k+t]
 		M[k+t] = temp
 	}
-	blockArr := a.Alphabet.TextToArray(block)
+	blockArr := a.Alphabet.TextToArray([]rune(block))
 	for j := 0; j < 4; j++ {
 		b := M[(1+j)%4]
 		c := M[j%4]
 		blockArr[b] = (blockArr[b] + blockArr[c]) % a.Alphabet.AlphabetLength
 	}
-	return a.Alphabet.ArrayToText(blockArr)
+	return string(a.Alphabet.ArrayToText(blockArr))
 }
 
 func (a *Trithemius) DecodeMergeBlock(block, key string) string {
@@ -170,7 +176,7 @@ func (a *Trithemius) DecodeMergeBlock(block, key string) string {
 	}
 
 	M := []int{0, 1, 2, 3}
-	keyArr := a.Alphabet.TextToArray(key)
+	keyArr := a.Alphabet.TextToArray([]rune(key))
 	var sum int
 	for i := 0; i < 16; i++ {
 		sign := 1
@@ -186,13 +192,13 @@ func (a *Trithemius) DecodeMergeBlock(block, key string) string {
 		M[k] = M[k+t]
 		M[k+t] = temp
 	}
-	blockArr := a.Alphabet.TextToArray(block)
+	blockArr := a.Alphabet.TextToArray([]rune(block))
 	for j := 3; j >= 0; j-- {
 		b := M[(1+j)%4]
 		c := M[j%4]
 		blockArr[b] = (a.Alphabet.AlphabetLength + blockArr[b] - blockArr[c]) % a.Alphabet.AlphabetLength
 	}
-	return a.Alphabet.ArrayToText(blockArr)
+	return string(a.Alphabet.ArrayToText(blockArr))
 }
 
 func (a *Trithemius) EncodeSTrithemiusM(block, key string) string {

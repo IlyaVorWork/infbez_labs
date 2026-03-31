@@ -5,7 +5,6 @@ import (
 	"infbez_labs/internal/core"
 	hasher "infbez_labs/internal/hash"
 	"slices"
-	"strings"
 )
 
 func InitializePRNG(seed string) []string {
@@ -93,7 +92,7 @@ func (l *LFSR) LFSR_Next(state, taps []int) [][]int {
 func (l *LFSR) SeedToBins(seeds []string) [][]int {
 	var out [][]int
 	for _, seed := range seeds {
-		out = append(out, l.Alphabet.BlockToBin(seed))
+		out = append(out, l.Alphabet.BlockToBin([]rune(seed)))
 	}
 	return out
 }
@@ -127,7 +126,7 @@ func (l *LFSR) ASLFSR_Next(state, taps [][]int) ([]int, [][]int) {
 
 func (l *LFSR) WrapCAsLfsrNext(initFlag string, stateIn [][][]int, seed string, tapsSet [][][]int) (string, [][][]int) {
 	var state [][][]int
-	var stream strings.Builder
+	var stream []rune ////
 	if initFlag == "up" {
 		init := InitializePRNG(seed)
 		for i := 0; i < 4; i++ {
@@ -157,8 +156,7 @@ func (l *LFSR) WrapCAsLfsrNext(initFlag string, stateIn [][][]int, seed string, 
 			}
 		}
 		block := l.Alphabet.BinToBlock(temp)
-		stream.Grow(len(block))
-		stream.WriteString(block)
+		stream = append(stream, block...)
 	}
-	return stream.String(), state
+	return string(stream), state
 }

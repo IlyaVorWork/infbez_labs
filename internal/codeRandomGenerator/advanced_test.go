@@ -194,7 +194,7 @@ func generateBits(lfsr *generator.LFSR, seed string, tapsSet [][][]int, bitsNeed
 		flag = "down"
 		runes := []rune(out)
 		for i := 0; i+3 < len(runes); i += 4 {
-			block := string(runes[i : i+4])
+			block := runes[i : i+4]
 			binBlock := alphabet.BlockToBin(block)
 			bits = append(bits, binBlock...)
 		}

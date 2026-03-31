@@ -82,7 +82,8 @@ func Test_SpongeHash_Random(t *testing.T) {
 			diff := alphabet.SubTxt(hash1, hash2)
 
 			for _, v := range []rune(diff) {
-				frequencies[alphabet.GetKeyByChar(string(v))] += 1
+				index, _ := alphabet.GetKeyByChar(v)
+				frequencies[index] += 1
 			}
 
 			t.Logf("Small Change test: input=%s, changedInput=%s, hash1=%s, hash2=%s, hashDiff=%s", p, changedInput, hash1, hash2, diff)
