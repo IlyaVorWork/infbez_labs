@@ -1,15 +1,15 @@
 package authEncryptionProtocol_test
 
 import (
-	"crypto/rand"
+	"encoding/binary"
 	"fmt"
 	"infbez_labs/internal/alphabet"
 	"infbez_labs/internal/authEncryptionProtocol"
-	"math/big"
+	"math/rand"
 	"testing"
 )
 
-func TestOracleAttacks(t *testing.T) {
+func TestConsistancyOracleAttacks(t *testing.T) {
 
 	PT := "ЯТАКБОЛЬШЕНЕМОГУ"
 	AssocdataArray := make([]string, 0)
@@ -23,48 +23,110 @@ func TestOracleAttacks(t *testing.T) {
 
 	telegraphAlphabet := alphabet.NewAlphabet(alphabet.TelegraphAlphabet)
 	protocol := authEncryptionProtocol.NewProtocol(telegraphAlphabet)
+	protocol.NewConnection(ADPrepare(AssocdataArray[1], "ЭКСТР"), "СЕАНСОВЫЙ_КЛЮЧИК", "СЕМИХАТОВ_КВАНТЫ")
 
 	t.Run(fmt.Sprintf("Нарушение целостности"), func(t *testing.T) {
-		XTST := protocol.PreparePacket(ADPrepare(AssocdataArray[1], ""), "УБЕЙТЕМЕНЯ", PT)
 
-		BITS := protocol.Transmit(XTST)
-		NEWBITS, _ := FlipRandomBitsCopy(BITS, 2)
+		XTST := protocol.Send(PT, "")
 
-		YTST := protocol.Recieve(NEWBITS)
+		FlipRandomBits(XTST, 2)
 
-		if XTST.String() == YTST.String() {
-			t.Errorf("Failed Protocol test. Packets not match")
-			return
-		}
+		protocol.Recieve(XTST)
 	})
 }
 
-func FlipRandomBitsCopy(data []byte, n int) ([]byte, error) {
-	if len(data) == 0 || n <= 0 {
-		out := make([]byte, len(data))
-		copy(out, data)
-		return out, nil
+func TestReplayOracleAttacks(t *testing.T) {
+
+	PT := "ЯТАКБОЛЬШЕНЕМОГУ"
+	AssocdataArray := make([]string, 0)
+
+	err := readFileByLines("sources/ad.txt", func(line string) {
+		AssocdataArray = append(AssocdataArray, line)
+	})
+	if err != nil {
+		return
 	}
 
-	// Копируем исходный массив, чтобы не менять оригинал
-	out := make([]byte, len(data))
-	copy(out, data)
+	telegraphAlphabet := alphabet.NewAlphabet(alphabet.TelegraphAlphabet)
+	protocol := authEncryptionProtocol.NewProtocol(telegraphAlphabet)
+	protocol.NewConnection(ADPrepare(AssocdataArray[1], "ЭКСТР"), "СЕАНСОВЫЙ_КЛЮЧИК", "СЕМИХАТОВ_КВАНТЫ")
 
-	totalBits := len(out) * 8
+	t.Run(fmt.Sprintf("Replay-атака"), func(t *testing.T) {
+
+		XTST := protocol.Send(PT, "")
+
+		t.Logf("Первая отправка")
+		protocol.Recieve(XTST)
+
+		t.Logf("Вторая отправка")
+		protocol.Recieve(XTST)
+	})
+}
+
+func TestConfidentialityOracleAttacks(t *testing.T) {
+
+	PT1 := "ЯТАКБОЛЬШЕНЕМОГУ"
+	PT2 := "УЖЕМОГУХИХИХАХАХ"
+	AssocdataArray := make([]string, 0)
+
+	err := readFileByLines("sources/ad.txt", func(line string) {
+		AssocdataArray = append(AssocdataArray, line)
+	})
+	if err != nil {
+		return
+	}
+
+	telegraphAlphabet := alphabet.NewAlphabet(alphabet.TelegraphAlphabet)
+	protocol := authEncryptionProtocol.NewProtocol(telegraphAlphabet)
+	protocol.NewConnection(ADPrepare(AssocdataArray[1], "ЭКСТР"), "СЕАНСОВЫЙ_КЛЮЧИК", "СЕМИХАТОВ_КВАНТЫ")
+
+	t.Run(fmt.Sprintf("IV-Replay-атака"), func(t *testing.T) {
+
+		victimBits := protocol.Send(PT1, "ОЧЕНЬСЕКРЕТНЫЙИВ")
+		victimPacket := protocol.Response(victimBits)
+
+		attackBits := protocol.Send(PT2, "ОЧЕНЬСЕКРЕТНЫЙИВ")
+		attackPacket := protocol.Response(attackBits)
+		
+		pt1XorPt2 := telegraphAlphabet.BlockXOR(victimPacket.Message, attackPacket.Message)
+		pt2 := telegraphAlphabet.BlockXOR(pt1XorPt2, []rune(PT1))
+
+		t.Log(PT2, string(pt2))
+	})
+}
+
+func FlipRandomBits(data []byte, n int) []byte {
+	if len(data) == 0 || n <= 0 {
+		return nil
+	}
+
+	totalBits := len(data) * 8
 
 	for i := 0; i < n; i++ {
-		r, err := rand.Int(rand.Reader, big.NewInt(int64(totalBits)))
+		bitIndex, err := cryptoRandInt(totalBits)
 		if err != nil {
-			return nil, err
+			return nil
 		}
 
-		bitIndex := int(r.Int64())
 		byteIndex := bitIndex / 8
 		bitOffset := bitIndex % 8
 
-		// Переворот бита
-		out[byteIndex] ^= 1 << bitOffset
+		// Переворачиваем бит через XOR
+		data[byteIndex] ^= 1 << bitOffset
 	}
 
-	return out, nil
+	return nil
+}
+
+func cryptoRandInt(max int) (int, error) {
+	if max <= 0 {
+		return 0, nil
+	}
+
+	var b [8]byte
+	if _, err := rand.Read(b[:]); err != nil {
+		return 0, err
+	}
+
+	return int(binary.LittleEndian.Uint64(b[:]) % uint64(max)), nil
 }

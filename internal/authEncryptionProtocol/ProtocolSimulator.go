@@ -66,11 +66,16 @@ func (p *ProtocolSimulator) NewConnection(assData AssData, keyIn, nonse string) 
 	}
 }
 
-func (p *ProtocolSimulator) Send(message string) []byte {
+func (p *ProtocolSimulator) Send(message string, forcedIV string) []byte {
 	var out []byte
 	var secPacket Packet
+	var iv []rune
 	p.msgCnt++
-	iv := append(p.iv0, p.EAX.CFB.alphabet.NumToBlock(p.msgCnt)...)
+	if forcedIV != "" {
+		iv = append([]rune{}, []rune(forcedIV)...)
+	} else {
+		iv = append(p.iv0, p.EAX.CFB.alphabet.NumToBlock(p.msgCnt)...)
+	}
 
 	packet := p.PreparePacket(p.AssData, string(iv), message)
 
