@@ -216,7 +216,7 @@ func (p *ProtocolSimulator) PreparePacket(dataIn AssData, IV, message string) Pa
 	}
 }
 
-func (p *ProtocolSimulator) checkPadding(binData []byte) (hasPad bool, numBlocks int, padLength int) {
+func (p *ProtocolSimulator) CheckPadding(binData []byte) (hasPad bool, numBlocks int, padLength int) {
 	var (
 		binDataLen = len(binData)
 		remain     = binDataLen % 80
@@ -307,7 +307,7 @@ func (p *ProtocolSimulator) PadMessage(message []rune) []rune {
 	hasPad := true
 
 	if remainder == 0 {
-		hasPad, _, _ = p.checkPadding(bins)
+		hasPad, _, _ = p.CheckPadding(bins)
 	}
 
 	if hasPad {
@@ -322,7 +322,7 @@ func (p *ProtocolSimulator) UnpadMessage(message []rune) []rune {
 	var (
 		bins, err         = p.alphabet.MessageToBin(message)
 		binsLen           = len(bins)
-		hasPad, _, padLen = p.checkPadding(bins)
+		hasPad, _, padLen = p.CheckPadding(bins)
 		resultRuneMessage = message
 	)
 
